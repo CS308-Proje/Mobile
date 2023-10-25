@@ -1,33 +1,7 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart';
-import 'package:http/http.dart' as http;
 import 'package:srs_mobile/components/square_tile.dart';
-
-void postData() async {
-  // Replace 'your-nodejs-backend-url' with the actual URL of your Node.js backend
-  var url = Uri.parse('http://localhost:5001/auth/login');
-
-  // Replace 'your-data' with the data you want to send to the backend
-  var data = {'email': 'value1', 'key2': 'value2'};
-
-  try {
-    var response = await http.post(
-      url,
-      body: data,
-    );
-
-    // Check the response status
-    if (response.statusCode == 200) {
-      print('Request successful');
-      print('Response: ${response.body}');
-    } else {
-      print('Request failed with status: ${response.statusCode}');
-      print('Response: ${response.body}');
-    }
-  } catch (error) {
-    print('Error making the request: $error');
-  }
-}
+import '../apis/login_api.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -130,10 +104,13 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    // Logic to handle login
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Login Successful!')),
-                    );
+                    print(
+                        _email); // i can see the mail i entered in the console
+                    print(
+                        _password); // i can see the password i entered in the console
+
+                    loginRequest(context, _email,
+                        _password); // it returns error code:400 however.
                   }
                 },
                 child: Ink(

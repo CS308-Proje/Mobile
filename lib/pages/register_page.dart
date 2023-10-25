@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
 import 'package:srs_mobile/components/square_tile.dart';
+import 'login_page.dart';
+import '../apis/register_api.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -112,7 +113,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         if (value == null || value.isEmpty) {
                           return 'Please confirm your password';
                         }
-                        if (value != _password) {
+                        if (_confirmPassword != _password) {
                           return 'Passwords do not match';
                         }
                         return null;
@@ -129,9 +130,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Registration Successful!')),
+                    print(
+                      _password,
                     );
+                    print(_confirmPassword);
+                    registerRequest(
+                        context, _username, _email, _confirmPassword);
                   }
                 },
                 child: Ink(
