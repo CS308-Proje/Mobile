@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+import 'package:srs_mobile/components/square_tile.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -23,7 +24,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('assets/srs_logoColored.png', height: 200),
+              Image.asset(
+                'assets/srs_logoColored.png',
+                height: 120,
+                width: 120,
+              ),
               SizedBox(height: 40),
               Form(
                 key: _formKey,
@@ -129,17 +134,34 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     );
                   }
                 },
-                child: Text('Register',
-                    style: TextStyle(fontSize: 18, color: Colors.black)),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  child: Container(
+                    padding: const EdgeInsets.all(25),
+                    margin: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Center(
+                      child: Text(
+                        "Register",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent, // Make the button transparent
+                  shadowColor: Colors.transparent, // No elevation shadow
+                  padding: EdgeInsets.all(
+                      0), // Reset padding because the Container already has padding
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 35),
               Row(
                 children: [
                   Expanded(
@@ -150,7 +172,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ),
                   Text('Or continue with',
-                      style: TextStyle(color: Colors.white)),
+                      style: TextStyle(color: Colors.grey[300])),
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(left: 8.0),
@@ -160,48 +182,34 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 35),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Google ile giriş yapma işlevselliği gelicek
+                  GestureDetector(
+                    onTap: () {
+                      // Logic for Google login
                     },
-                    child: Image.asset('assets/google_icon.png',
-                        height: 70, width: 70),
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Color(0xFF80A254),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.all(0),
+                    child: SquareTile(
+                      imagePath: 'assets/google_icon.png',
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Apple ile giriş yapma işlevselliği gelicek
+                  GestureDetector(
+                    onTap: () {
+                      // Logic for Apple login
                     },
-                    child: Image.asset('assets/apple_icon.png',
-                        height: 70, width: 70),
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Color(0xFF80A254),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.all(0),
+                    child: SquareTile(
+                      imagePath: 'assets/apple_icon.png',
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already have an account?",
+                    "Already a member?",
                     style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(width: 5),

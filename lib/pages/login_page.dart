@@ -1,5 +1,33 @@
 import 'package:flutter/material.dart';
 import 'register_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:srs_mobile/components/square_tile.dart';
+
+void postData() async {
+  // Replace 'your-nodejs-backend-url' with the actual URL of your Node.js backend
+  var url = Uri.parse('http://localhost:5001/auth/login');
+
+  // Replace 'your-data' with the data you want to send to the backend
+  var data = {'email': 'value1', 'key2': 'value2'};
+
+  try {
+    var response = await http.post(
+      url,
+      body: data,
+    );
+
+    // Check the response status
+    if (response.statusCode == 200) {
+      print('Request successful');
+      print('Response: ${response.body}');
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+      print('Response: ${response.body}');
+    }
+  } catch (error) {
+    print('Error making the request: $error');
+  }
+}
 
 class LoginPage extends StatefulWidget {
   @override
@@ -21,8 +49,21 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('assets/srs_logoColored.png', height: 200),
-              SizedBox(height: 40),
+              Image.asset(
+                'assets/srs_logoColored.png',
+                height: 120,
+                width: 120,
+              ),
+              SizedBox(height: 30),
+              // welcome back, you've been missed!
+              Text(
+                'Sound Recommendation System',
+                style: TextStyle(
+                  color: Colors.grey[300],
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 25),
               Form(
                 key: _formKey,
                 child: Column(
@@ -71,6 +112,19 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: Colors.grey[300]),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
@@ -82,69 +136,80 @@ class _LoginPageState extends State<LoginPage> {
                     );
                   }
                 },
-                child: Text('Login',
-                    style: TextStyle(fontSize: 18, color: Colors.black)),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  child: Container(
+                    padding: const EdgeInsets.all(25),
+                    margin: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Center(
+                      child: Text(
+                        "Sign In",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.transparent, // Make the button transparent
+                  shadowColor: Colors.transparent, // No elevation shadow
+                  padding: EdgeInsets.all(
+                      0), // Reset padding because the Container already has padding
                 ),
               ),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8.0),
-                      height: 1,
-                      color: Colors.white,
+              SizedBox(height: 50),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        thickness: 0.5,
+                        color: Colors.grey[400],
+                      ),
                     ),
-                  ),
-                  Text('Or continue with',
-                      style: TextStyle(color: Colors.white)),
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 8.0),
-                      height: 1,
-                      color: Colors.white,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text(
+                        'Or continue with',
+                        style: TextStyle(
+                          color: Colors.grey[300],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Divider(
+                        thickness: 0.5,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
+                  GestureDetector(
+                    onTap: () {
                       // Logic for Google login
                     },
-                    child: Image.asset('assets/google_icon.png',
-                        height: 70, width: 70),
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Color(0xFF80A254),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.all(0),
+                    child: SquareTile(
+                      imagePath: 'assets/google_icon.png',
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
+                  GestureDetector(
+                    onTap: () {
                       // Logic for Apple login
                     },
-                    child: Image.asset('assets/apple_icon.png',
-                        height: 70, width: 70),
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Color(0xFF80A254),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.all(0),
+                    child: SquareTile(
+                      imagePath: 'assets/apple_icon.png',
                     ),
                   ),
                 ],
@@ -154,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account?",
+                    "Not a member?",
                     style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(width: 5),
@@ -167,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     },
                     child: Text(
-                      "Register here",
+                      "Register now",
                       style: TextStyle(
                         color: Color(0xFF80A254),
                         fontWeight: FontWeight.bold,
