@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:srs_mobile/components/square_tile.dart';
-import '../apis/login_api.dart';
-import 'register_page.dart';
+import 'login_page.dart';
+import '../apis/register_api.dart';
 
-class LoginPage extends StatefulWidget {
+class RegistrationPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegistrationPageState createState() => _RegistrationPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
+  String _username = '';
   String _email = '';
   String _password = '';
+  String _confirmPassword = '';
 
   @override
   Widget build(BuildContext context) {
@@ -28,24 +30,36 @@ class _LoginPageState extends State<LoginPage> {
                 height: 120,
                 width: 120,
               ),
-              SizedBox(height: 30),
-              // welcome back, you've been missed!
-              Text(
-                'Sound Recommendation System',
-                style: TextStyle(
-                  color: Colors.grey[300],
-                  fontSize: 16,
-                ),
-              ),
-              SizedBox(height: 25),
+              SizedBox(height: 40),
               Form(
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
                     TextFormField(
                       decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        filled: true,
+                        fillColor: Colors.white, // or any other color
+                        filled:
+                            true, // This is important. It tells the InputDecoration to use the fillColor
+                        hintText: 'Username',
+                        prefixIcon: Icon(Icons.person_outline,
+                            color: Color(0xFF80A254)),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a username';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _username = value!;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        fillColor: Colors.white, // or any other color
+                        filled:
+                            true, // This is important. It tells the InputDecoration to use the fillColor
                         hintText: 'Email',
                         prefixIcon: Icon(Icons.email_outlined,
                             color: Color(0xFF80A254)),
@@ -66,8 +80,9 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 20),
                     TextFormField(
                       decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        filled: true,
+                        fillColor: Colors.white, // or any other color
+                        filled:
+                            true, // This is important. It tells the InputDecoration to use the fillColor
                         hintText: 'Password',
                         prefixIcon:
                             Icon(Icons.lock_outline, color: Color(0xFF80A254)),
@@ -83,18 +98,29 @@ class _LoginPageState extends State<LoginPage> {
                         _password = value!;
                       },
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[300]),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        fillColor: Colors.white, // or any other color
+                        filled:
+                            true, // This is important. It tells the InputDecoration to use the fillColor
+                        hintText: 'Confirm Password',
+                        prefixIcon:
+                            Icon(Icons.lock_outline, color: Color(0xFF80A254)),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (_confirmPassword != _password) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _confirmPassword = value!;
+                      },
                     ),
                   ],
                 ),
@@ -105,12 +131,11 @@ class _LoginPageState extends State<LoginPage> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     print(
-                        _email); // i can see the mail i entered in the console
-                    print(
-                        _password); // i can see the password i entered in the console
-
-                    loginRequest(context, _email,
-                        _password); // it returns error code:400 however.
+                      _password,
+                    );
+                    print(_confirmPassword);
+                    registerRequest(
+                        context, _username, _email, _confirmPassword);
                   }
                 },
                 child: Ink(
@@ -123,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                     margin: const EdgeInsets.symmetric(horizontal: 25),
                     child: Center(
                       child: Text(
-                        "Sign In",
+                        "Register",
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -140,36 +165,28 @@ class _LoginPageState extends State<LoginPage> {
                       0), // Reset padding because the Container already has padding
                 ),
               ),
-              SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+              SizedBox(height: 35),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8.0),
+                      height: 1,
+                      color: Colors.white,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(
-                          color: Colors.grey[300],
-                        ),
-                      ),
+                  ),
+                  Text('Or continue with',
+                      style: TextStyle(color: Colors.grey[300])),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 8.0),
+                      height: 1,
+                      color: Colors.white,
                     ),
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 35),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -196,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Not a member?",
+                    "Already a member?",
                     style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(width: 5),
@@ -204,12 +221,11 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => RegistrationPage()),
+                        MaterialPageRoute(builder: (context) => LoginPage()),
                       );
                     },
                     child: Text(
-                      "Register now",
+                      "Login here",
                       style: TextStyle(
                         color: Color(0xFF80A254),
                         fontWeight: FontWeight.bold,
