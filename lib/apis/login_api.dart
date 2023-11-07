@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../pages/MainPage.dart';
 
 Future<void> loginRequest(
     BuildContext context, String email, String password) async {
@@ -20,6 +21,8 @@ Future<void> loginRequest(
       print('Request successful');
       print('Response: ${response.body}');
       // Ideally, you should update your UI based on successful response here !!!!
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MainPage()));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login Successful!')),
       );

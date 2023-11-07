@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../pages/MainPage.dart';
 
 Future<void> registerRequest(BuildContext context, String username,
     String email, String password) async {
@@ -26,7 +27,8 @@ Future<void> registerRequest(BuildContext context, String username,
     if (response.statusCode == 200) {
       print('Registration successful');
       print('Response: ${response.body}');
-      // Update UI based on successful registration
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MainPage()));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration Successful!')),
       );
