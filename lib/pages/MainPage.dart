@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class MainPage extends StatelessWidget {
   @override
@@ -92,7 +93,6 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
-
 class _MusicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -100,14 +100,33 @@ class _MusicList extends StatelessWidget {
       height: 150.0,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: 5, // example data count
-        itemBuilder: (context, index) => _MusicCard(),
+        itemCount: 5, 
+        itemBuilder: (context, index) {
+          return _MusicCard(
+            songTitle: 'Song Title $index',
+          );
+        },
       ),
     );
   }
 }
 
-class _MusicCard extends StatelessWidget {
+class _MusicCard extends StatefulWidget {
+  final String songTitle;
+
+  _MusicCard({required this.songTitle});
+
+  @override
+  __MusicCardState createState() => __MusicCardState();
+}
+class __MusicCardState extends State<_MusicCard> {
+  double _rating = 0;
+  double _previousRating = 0;
+
+  void _sendRating() {
+    // API'ye puanlama isteği   
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -121,12 +140,67 @@ class _MusicCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Icon(Icons.music_note, size: 50.0, color: Colors.white),
-          Text('Song Title', style: TextStyle(color: Colors.white)),
+          Text(widget.songTitle, style: TextStyle(color: Colors.white)),
+          RatingBar.builder(
+            initialRating: _rating,
+            minRating: 1,
+            direction: Axis.horizontal,
+            allowHalfRating: true,
+            itemCount: 5,
+            itemSize: 16.0,
+            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+            itemBuilder: (context, _) => Icon(
+              Icons.star,
+              color: Colors.amber,
+            ),
+            onRatingUpdate: (rating) {
+              if (_rating != 0 && _rating != rating) {
+                
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      backgroundColor: Colors.grey[800], 
+                      title: Text('Change Rating', style: TextStyle(color: Colors.white)),
+                      content: Text('Are you sure you want to change your rating?', style: TextStyle(color: Colors.white)),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Cancel', style: TextStyle(color: Colors.green)),
+                          onPressed: () {
+                            Navigator.pop(context); 
+                            },
+                        ),
+                        TextButton(
+                          child: Text('OK', style: TextStyle(color: Colors.green)),
+                          onPressed: () {
+                            setState(() {
+                              _rating = rating;
+                            });
+                            Navigator.pop(context);
+                            _sendRating(); 
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                setState(() {
+                  _previousRating = _rating; 
+                  _rating = rating;
+                });
+                _sendRating(); 
+              }
+            },
+          ),
         ],
       ),
     );
   }
 }
+
+
+
 
 class _BottomBar extends StatelessWidget {
   @override
