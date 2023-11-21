@@ -3,18 +3,20 @@ import 'register_page.dart';
 import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF171717),
+      backgroundColor: const Color(0xFF171717),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             Image.asset('assets/srs_logoColored.png', height: 200),
-            SizedBox(height: 50),
-            Text(
+            const SizedBox(height: 50),
+            const Text(
               "THE CUTTING-EDGE",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -23,8 +25,8 @@ class HomePage extends StatelessWidget {
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 5),
-            Text(
+            const SizedBox(height: 5),
+            const Text(
               "SONG RECOMMENDATION SYSTEM",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -33,41 +35,41 @@ class HomePage extends StatelessWidget {
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                    MaterialPageRoute(builder: (context) => const LoginPage()));
               },
-              child: Text('Log In',
-                  style: TextStyle(fontSize: 18, color: Colors.black)),
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                fixedSize: Size(150, 45),
+                backgroundColor: Colors.white,
+                fixedSize: const Size(150, 45),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              child: const Text('Log In',
+                  style: TextStyle(fontSize: 18, color: Colors.black)),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RegistrationPage()));
+                        builder: (context) => const RegistrationPage()));
               },
-              child: Text('Sign Up',
-                  style: TextStyle(fontSize: 18, color: Colors.black)),
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                fixedSize: Size(150, 45),
+                backgroundColor: Colors.white,
+                fixedSize: const Size(150, 45),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              child: const Text('Sign Up',
+                  style: TextStyle(fontSize: 18, color: Colors.black)),
             ),
-            SizedBox(height: 70),
+            const SizedBox(height: 70),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -76,8 +78,8 @@ class HomePage extends StatelessWidget {
                   width: 40,
                   color: Colors.white,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text('Or continue with',
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -88,7 +90,7 @@ class HomePage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

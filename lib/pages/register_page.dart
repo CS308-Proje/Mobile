@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:srs_mobile/components/square_tile.dart';
 import 'login_page.dart';
-import '../apis/register_api.dart';
+import '../apis/AuthLogic.dart';
 
 class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -18,7 +20,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF171717),
+      backgroundColor: const Color(0xFF171717),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32.0),
@@ -30,13 +32,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 height: 120,
                 width: 120,
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               Form(
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white, // or any other color
                         filled:
                             true, // This is important. It tells the InputDecoration to use the fillColor
@@ -54,9 +56,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         _username = value!;
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white, // or any other color
                         filled:
                             true, // This is important. It tells the InputDecoration to use the fillColor
@@ -77,9 +79,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         _email = value!;
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white, // or any other color
                         filled:
                             true, // This is important. It tells the InputDecoration to use the fillColor
@@ -98,9 +100,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         _password = value!;
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white, // or any other color
                         filled:
                             true, // This is important. It tells the InputDecoration to use the fillColor
@@ -125,7 +127,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -138,6 +140,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         context, _username, _email, _confirmPassword);
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.transparent, // Make the button transparent
+                  shadowColor: Colors.transparent, // No elevation shadow
+                  padding: const EdgeInsets.all(
+                      0), // Reset padding because the Container already has padding
+                ),
                 child: Ink(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -146,7 +155,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   child: Container(
                     padding: const EdgeInsets.all(25),
                     margin: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         "Register",
                         style: TextStyle(
@@ -158,14 +167,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent, // Make the button transparent
-                  shadowColor: Colors.transparent, // No elevation shadow
-                  padding: EdgeInsets.all(
-                      0), // Reset padding because the Container already has padding
-                ),
               ),
-              SizedBox(height: 35),
+              const SizedBox(height: 35),
               Row(
                 children: [
                   Expanded(
@@ -186,7 +189,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 35),
+              const SizedBox(height: 35),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -194,7 +197,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     onTap: () {
                       // Logic for Google login
                     },
-                    child: SquareTile(
+                    child: const SquareTile(
                       imagePath: 'assets/google_icon.png',
                     ),
                   ),
@@ -202,29 +205,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     onTap: () {
                       // Logic for Apple login
                     },
-                    child: SquareTile(
+                    child: const SquareTile(
                       imagePath: 'assets/apple_icon.png',
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Already a member?",
                     style: TextStyle(color: Colors.white),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Login here",
                       style: TextStyle(
                         color: Color(0xFF80A254),

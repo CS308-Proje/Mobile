@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:srs_mobile/components/square_tile.dart';
-import '../apis/login_api.dart';
+import '../apis/AuthLogic.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -16,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF171717),
+      backgroundColor: const Color(0xFF171717),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32.0),
@@ -28,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 120,
                 width: 120,
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               // welcome back, you've been missed!
               Text(
                 'Sound Recommendation System',
@@ -37,13 +39,13 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
               Form(
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         filled: true,
                         hintText: 'Email',
@@ -63,9 +65,9 @@ class _LoginPageState extends State<LoginPage> {
                         _email = value!;
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         filled: true,
                         hintText: 'Password',
@@ -99,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -113,6 +115,13 @@ class _LoginPageState extends State<LoginPage> {
                         _password); // it returns error code:400 however.
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.transparent, // Make the button transparent
+                  shadowColor: Colors.transparent, // No elevation shadow
+                  padding: const EdgeInsets.all(
+                      0), // Reset padding because the Container already has padding
+                ),
                 child: Ink(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -121,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     padding: const EdgeInsets.all(25),
                     margin: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         "Sign In",
                         style: TextStyle(
@@ -133,14 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent, // Make the button transparent
-                  shadowColor: Colors.transparent, // No elevation shadow
-                  padding: EdgeInsets.all(
-                      0), // Reset padding because the Container already has padding
-                ),
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: Row(
@@ -169,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -177,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       // Logic for Google login
                     },
-                    child: SquareTile(
+                    child: const SquareTile(
                       imagePath: 'assets/google_icon.png',
                     ),
                   ),
@@ -185,30 +188,30 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       // Logic for Apple login
                     },
-                    child: SquareTile(
+                    child: const SquareTile(
                       imagePath: 'assets/apple_icon.png',
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Not a member?",
                     style: TextStyle(color: Colors.white),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => RegistrationPage()),
+                            builder: (context) => const RegistrationPage()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Register now",
                       style: TextStyle(
                         color: Color(0xFF80A254),
