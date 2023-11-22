@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/songModel.dart';
+import '../apis/MySongs_Logic.dart';
 
 class MusicRemovePage extends StatefulWidget {
   const MusicRemovePage({super.key});
@@ -12,84 +14,56 @@ class _MusicRemovePageState extends State<MusicRemovePage> {
   TextEditingController searchController = TextEditingController();
   List<String> _allItems = []; // List to hold all items
   List<String> _items = []; // List to hold songs, albums, or artists
-  List<String> songs = [
-    "Shape of You",
-    "Blinding Lights",
-    "Uptown Funk",
-    "Old Town Road",
-    "Sunflower",
-    "Thinking Out Loud",
-    "Despacito",
-    "God's Plan",
-    "Perfect",
-    "All of Me",
-    "Closer",
-    "Rockstar",
-    "Someone You Loved",
-    "Bad Guy",
-    "Believer"
-  ];
-  List<String> albums = [
-    "Thriller",
-    "Back in Black",
-    "The Dark Side of the Moon",
-    "The Bodyguard",
-    "Rumours",
-    "Saturday Night Fever",
-    "Abbey Road",
-    "Born in the U.S.A.",
-    "Hotel California",
-    "1",
-    "21",
-    "Nevermind",
-    "Diamonds",
-    "Falling into You",
-    "1989"
-  ];
-  List<String> artists = [
-    "The Beatles",
-    "Michael Jackson",
-    "Elvis Presley",
-    "Madonna",
-    "Elton John",
-    "Led Zeppelin",
-    "Pink Floyd",
-    "Rihanna",
-    "Mariah Carey",
-    "The Rolling Stones",
-    "Taylor Swift",
-    "Bob Dylan",
-    "Queen",
-    "U2",
-    "Bruce Springsteen"
-  ];
+  List<String> songs = [];
+  List<String> albums = [];
+  List<String> artists = [];
 
   @override
   void initState() {
     super.initState();
-    _loadItems(); // Load initial data
+    _fetchSongs();
+    _fetchAlbums();
+    _fetchArtists();
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchSongs();
-  // }
+  void _fetchSongs() async {
+    try {
+      List<Song> songObjects = await SongService().fetchSongs();
+      List<String> fetchedSongNames = songObjects.map((song) => song.songName).toList();
+      setState(() {
+        songs = fetchedSongNames;
+        _loadItems(); // Load initial data with fetched song names
+      });
+    } catch (e) {
+      print('Error fetching songs: $e');
+    }
+  }
 
-  // void fetchSongs() async {
-  //   var url = Uri.parse('http://10.0.2.2:5001/songs');
-  //   var response = await http.get(url);
+  void _fetchAlbums() async {
+    try {
+      List<Song> songObjects = await SongService().fetchSongs();
+      List<String> fetchedAlbumNames = songObjects.map((song) => song.albumName).toList();
+      setState(() {
+        albums = fetchedAlbumNames;
+        _loadItems(); // Load initial data with fetched song names
+      });
+    } catch (e) {
+      print('Error fetching albums: $e');
+    }
+  }
 
-  //   if (response.statusCode == 200) {
-  //     var jsonResponse = json.decode(response.body) as List;
-  //     setState(() {
-  //       _allItems = jsonResponse.map((song) => song['name'].toString()).toList();
-  //       _items = List.from(_allItems);
-  //     });
-  //   } else {
-  //     print('Request failed with status: ${response.statusCode}.');
-  //   }
-  // }
+  void _fetchArtists() async {
+    try {
+      List<Song> songObjects = await SongService().fetchSongs();
+      List<String> fetchedArtistNames = songObjects.map((song) => song.mainArtistName).toList();
+      setState(() {
+        artists = fetchedArtistNames;
+        _loadItems(); // Load initial data with fetched song names
+      });
+    } catch (e) {
+      print('Error fetching artists: $e');
+    }
+  }
 
   void _loadItems() {
     if (_selectedOption == 'Song') {
@@ -99,10 +73,8 @@ class _MusicRemovePageState extends State<MusicRemovePage> {
     } else if (_selectedOption == 'Artist') {
       _allItems = artists;
     }
-
-    _items = List.from(
-        _allItems); // Initially, all items of the selected type are displayed
-    setState(() {}); // Update UI
+    _items = List.from(_allItems);
+    setState(() {}); // Trigger UI update
   }
 
   void _filterItems(String searchText) {
@@ -134,7 +106,7 @@ class _MusicRemovePageState extends State<MusicRemovePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF171717),
         elevation: 0.0,
         toolbarHeight: 60.0,
         leading: IconButton(
@@ -153,9 +125,7 @@ class _MusicRemovePageState extends State<MusicRemovePage> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            const SizedBox(height: 10),
-            ////////////////
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children:

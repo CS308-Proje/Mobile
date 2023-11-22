@@ -1,7 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:convert';
-import 'dart:io';
+import '../apis/MySongs_Logic.dart';
 
 class AddMusicFile extends StatefulWidget {
   const AddMusicFile({super.key});
@@ -11,30 +13,115 @@ class AddMusicFile extends StatefulWidget {
 }
 
 class _AddMusicFileState extends State<AddMusicFile> {
-  void pickAndReadFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+  File? file;
+  Future<void> pickAndReadFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
-      try {
-        String content = await file.readAsString();
-        List<dynamic> songData = jsonDecode(content);
+      setState(() {
+        file = File(result.files.single.path!);
+      });
 
-        for (var song in songData) {
-          print('Song Name: ${song['songName']}');
-          print('Album Name: ${song['albumName']}');
-          print('Main Artist Name: ${song['mainArtistName']}');
-          List<String> featuringArtists = song['featuringArtistNames'] != null
-              ? List<String>.from(song['featuringArtistNames'])
-              : [];
-          print('Featuring Artist Names: ${featuringArtists.join(', ')}');
-          print('------------------------');
-        }
-      } catch (e) {
-        print('Error reading file or invalid JSON format: $e');
+      List<int> resultCounts = await SongService().addSongFile(file!);
+
+      int addedCount = resultCounts[0];
+      int failedCount = resultCounts[1];
+
+      if (failedCount == 0) {
+        // All songs were added successfully
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Success'),
+              content: Text('Added $addedCount songs successfully.'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                side: BorderSide(color: Colors.green, width: 2.5),
+              ),
+              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.green),
+              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              backgroundColor: Colors.grey[800],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.green, // Color for text
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Some songs failed to add
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: Text('Could not add $failedCount songs.'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                side: BorderSide(color: Colors.red, width: 2.5),
+              ),
+              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              backgroundColor: Colors.grey[800],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                ),
+              ],
+            );
+          },
+        );
       }
-    } else {
-      print("No file selected!");
+    } 
+
+    // If the file could not be opened
+    else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Could not open the file.'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                side: BorderSide(color: Colors.red, width: 2.5),
+              ),
+              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              backgroundColor: Colors.grey[800],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                ),
+              ],
+            );
+          },
+        );
     }
   }
 
