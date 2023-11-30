@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'AuthLogic.dart';
 
 Future<void> rateSong(String songId, String userId, int ratingValue) async {
-  var url = Uri.parse('http://localhost:5001/rating/rateSong');
+  var url = Uri.parse('http://10.0.2.2:5000/rating/rateSong');
   String? token = await storage.read(key: 'token'); // Retrieve the token
 
   var headers = {

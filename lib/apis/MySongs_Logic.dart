@@ -114,4 +114,91 @@ class SongService {
     List<int> SF = [addedCount, failedCount];
     return SF;
   }
+
+  Future<bool> deleteSongById(String songId) async {
+    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
+    };
+
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:5000/songs/$songId'), // Use the song ID in the URL
+        headers: headers,
+      );
+
+      final responseBody = json.decode(response.body);
+      final deletedSongName = responseBody['song']['songName'];
+
+      if (response.statusCode == 200) {
+      print('The song $deletedSongName deleted successfully');
+      return true;
+      } else {
+        print('Failed to delete the song $deletedSongName. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteArtistById(String artistId) async {
+    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
+    };
+
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:5000/artists/$artistId'), // Use the song ID in the URL
+        headers: headers,
+      );
+
+      final responseBody = json.decode(response.body);
+      final deletedArtistName = responseBody['song']['mainArtistName'];
+
+      if (response.statusCode == 200) {
+      print('The artist $deletedArtistName deleted successfully');
+      return true;
+      } else {
+        print('Failed to delete the artist $deletedArtistName. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteAlbumById(String albumId) async {
+    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
+    };
+
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:5000/albums/$albumId'), // Use the song ID in the URL
+        headers: headers,
+      );
+
+      final responseBody = json.decode(response.body);
+      final deletedAlbumName = responseBody['song']['albumName'];
+
+      if (response.statusCode == 200) {
+      print('The album $deletedAlbumName deleted successfully');
+      return true;
+      } else {
+        print('Failed to delete the album $deletedAlbumName. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
 }
