@@ -6,6 +6,11 @@ import '../models/friendModel.dart';
 const storage = FlutterSecureStorage();
 
 class MyFriendsLogic {
+
+  Future<String?> fetchUserId() async {
+    return await storage.read(key: 'userId');
+  }
+  
   Future<List<Friend>> fetchUserFriends(String userId) async {
     String? token = await storage.read(key: 'token');
 
@@ -29,7 +34,7 @@ class MyFriendsLogic {
     }
   }
 
-  static Future<void> addFriendByUsername(String username) async {
+  Future<void> addFriendByUsername(String username) async {
     String? token = await storage.read(key: 'token');
 
     final headers = {
@@ -50,6 +55,75 @@ class MyFriendsLogic {
     } else {
       print('Failed to add friend. Status code: ${response.statusCode}');
       throw Exception('Failed to add friend');
+    }
+  }
+
+  Future<void> addFriendById(String userId, String friendId) async {
+    final url = Uri.parse('http://10.0.2.2:5000/friends/add');
+
+    final Map<String, String> data = {
+      'userId': userId,
+      'friendId': friendId,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      // Friend added successfully
+      print('Friend added successfully');
+    } else {
+      // Handle errors if necessary
+      print('Error adding friend. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<void> removeFriendByUsername(String username) async {
+    String? token = await storage.read(key: 'token');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final body = json.encode({'username': username});
+
+    final response = await http.delete(
+      Uri.parse('http://10.0.2.2:5000/friends/remove'),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      print('Friend removed successfully.');
+    } else {
+      print('Failed to remove friend. Status code: ${response.statusCode}');
+      throw Exception('Failed to remove friend');
+    }
+  }
+
+  Future<void> removeFriendById(String userId, String friendId) async {
+    final url = Uri.parse('http://10.0.2.2:5000/friends/remove');
+
+    final Map<String, String> data = {
+      'userId': userId,
+      'friendId': friendId,
+    };
+
+    final response = await http.delete(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      // Friend removed successfully
+      print('Friend removed successfully');
+    } else {
+      print('Error removing friend. Status code: ${response.statusCode}');
     }
   }
 }
