@@ -1,30 +1,83 @@
 import 'dart:io';
 import 'dart:convert';
+import 'AuthLogic.dart'; // Secure storage
 import 'package:http/http.dart' as http;
 import '../models/songModel.dart'; // Import the Song model
-// secure storage
-import 'AuthLogic.dart';
+import '../models/artistModel.dart'; // Import the Artist model
+import '../models/albumModel.dart'; // Import the Album model
 
 class SongService {
+  
   Future<List<Song>> fetchSongs() async {
-    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
+    try {
+      String? tokenStorage = await storage.read(key: 'token');
+      final headers = {
+        'Authorization': 'Bearer $tokenStorage',
+      };
+
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:5000/songs'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body) as Map<String, dynamic>;
+        var songs = data['songs'] as List;
+
+        return songs.map<Song>((json) => Song.fromJson(json)).toList();
+      } else {
+        print('Request failed with status: ${response.statusCode}.');
+        throw Exception('Failed to load songs');
+      }
+    } catch (e) {
+      print('Error fetching songs: $e');
+      throw Exception('Failed to load songs');
+    }
+  }
+
+  Future<List<Artist>> fetchArtists() async {
+    String? tokenStorage = await storage.read(key: 'token');
 
     final headers = {
-      'Authorization':
-          'Bearer $tokenStorage', // Replace with your actual access token
+      'Authorization': 'Bearer $tokenStorage',
     };
 
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/songs'),
-        headers: headers);
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:5000/artists'),
+      headers: headers,
+    );
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body) as Map<String, dynamic>;
-      var songs = data['songs'] as List;
+      var artists = data['artists'] as List;
 
-      return songs.map<Song>((json) => Song.fromJson(json)).toList();
+      return artists.map<Artist>((json) => Artist.fromJson(json)).toList();
     } else {
       print('Request failed with status: ${response.statusCode}.');
-      throw Exception('Failed to load songs');
+      throw Exception('Failed to load artists');
+    }
+  }
+
+  Future<List<Album>> fetchAlbums() async {
+    String? tokenStorage = await storage.read(key: 'token');
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage',
+    };
+
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:5000/albums'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body) as Map<String, dynamic>;
+      var albums = data['albums'] as List;
+
+      return albums.map<Album>((json) => Album.fromJson(json)).toList();
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+      throw Exception('Failed to load albums');
     }
   }
 
@@ -79,126 +132,163 @@ class SongService {
     }
   }
 
-  Future<List<int>> addSongFile(File file) async {
-    String content = await file.readAsString();
-    List<dynamic> songData = jsonDecode(content);
+  Future<List<int>> addSongFileWithProgress(File file, void Function(double)? onProgress) async {
+    try {
+      String content = await file.readAsString();
+      List<dynamic> songs = jsonDecode(content);
 
-    int addedCount = 0;
-    int failedCount = 0;
+      int addedCount = 0;
+      int failedCount = 0;
 
-    for (var song in songData) { 
-      print('Song Name: ${song['songName']}');
-      print('Album Name: ${song['albumName']}');
-      print('Main Artist Name: ${song['mainArtistName']}');
-      List<String> featuringArtists = song['featuringArtistNames'] != null
-          ? List<String>.from(song['featuringArtistNames'])
-          : [];
-      print('Featuring Artist Names: ${featuringArtists.join(', ')}');
-      print('------------------------');
+      for (var i = 0; i < songs.length; i++) {
+        try {
+          // Extract song information
+          var songData = songs[i];
+          String songName = songData['songName'];
+          String mainArtist = songData['mainArtistName'];
+          List<String> featuringArtists = List<String>.from(songData['featuringArtistNames']);
+          String albumName = songData['albumName'];
 
-      bool isAdded = await SongService().addSongInfo(
-        song['songName'], 
-        song['mainArtistName'], 
-        featuringArtists, 
-        song['albumName']
-      );
+          // Add the song (implement this method in your SongService)
+          bool isAdded = await addSongInfo(songName, mainArtist, featuringArtists, albumName);
 
-      if (isAdded) {
-        addedCount++;
-      } else {
-        failedCount++;
-        print('Could not add a song: ${json.encode(songData)}');
+          if (isAdded) {
+            addedCount++;
+          } else {
+            failedCount++;
+          }
+        } catch (e) {
+          print('Error processing song data: $e');
+          failedCount++;
+        }
+
+        // Report progress
+        if (onProgress != null) {
+          double progress = (i + 1) / songs.length;
+          onProgress(progress);
+        }
       }
+
+      return [addedCount, failedCount];
+    } catch (e) {
+      print('Error reading file content: $e');
+      return [0, 0];
     }
-    
-    List<int> SF = [addedCount, failedCount];
-    return SF;
   }
 
-  Future<bool> deleteSongById(String songId) async {
-    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
-
-    final headers = {
-      'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
-    };
-
+  Future<bool> transferSongs(String databaseURI, String databaseName, String collectionName) async {
     try {
-      final response = await http.delete(
-        Uri.parse('http://10.0.2.2:5000/songs/$songId'), // Use the song ID in the URL
+      String? tokenStorage = await storage.read(key: 'token'); // Await the Future
+
+      final headers = {
+        'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
+        'Content-Type': 'application/json',
+      };
+
+      final transferData = {
+        'databaseURI': databaseURI,
+        'databaseName': databaseName,
+        'collectionName': collectionName,
+      };
+
+      final data = jsonEncode(transferData);
+
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5000/transfer-songs'),
         headers: headers,
+        body: data,
       );
 
-      final responseBody = json.decode(response.body);
-      final deletedSongName = responseBody['song']['songName'];
-
-      if (response.statusCode == 200) {
-      print('The song $deletedSongName deleted successfully');
-      return true;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Songs transferred successfully');
+        print('Response body: ${response.body}');
+        return true;
       } else {
-        print('Failed to delete the song $deletedSongName. Status code: ${response.statusCode}');
+        print('Failed to transfer songs. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
         return false;
       }
     } catch (e) {
-      print('Error: $e');
+      print('Error transferring songs: $e');
       return false;
     }
   }
 
-  Future<bool> deleteArtistById(String artistId) async {
-    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
-
-    final headers = {
-      'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
-    };
-
+  // Remove song by ID
+  Future<void> removeSong(String songId) async {
     try {
+      String? tokenStorage = await storage.read(key: 'token');
+      final headers = {
+        'Authorization': 'Bearer $tokenStorage',
+      };
+
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:5000/artists/$artistId'), // Use the song ID in the URL
+        Uri.parse('http://10.0.2.2:5000/songs/$songId'),
         headers: headers,
       );
 
-      final responseBody = json.decode(response.body);
-      final deletedArtistName = responseBody['song']['mainArtistName'];
-
       if (response.statusCode == 200) {
-      print('The artist $deletedArtistName deleted successfully');
-      return true;
+        print('Song removed successfully.');
       } else {
-        print('Failed to delete the artist $deletedArtistName. Status code: ${response.statusCode}');
-        return false;
+        print('Failed to remove song. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        // Handle the error as needed
       }
     } catch (e) {
-      print('Error: $e');
-      return false;
+      print('Error removing song: $e');
+      // Handle the error as needed
     }
   }
 
-  Future<bool> deleteAlbumById(String albumId) async {
-    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
-
-    final headers = {
-      'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
-    };
-
+  // Remove album by ID
+  Future<void> removeAlbum(String albumId) async {
     try {
+      String? tokenStorage = await storage.read(key: 'token');
+      final headers = {
+        'Authorization': 'Bearer $tokenStorage',
+      };
+
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:5000/albums/$albumId'), // Use the song ID in the URL
+        Uri.parse('http://10.0.2.2:5000/albums/$albumId'),
         headers: headers,
       );
 
-      final responseBody = json.decode(response.body);
-      final deletedAlbumName = responseBody['song']['albumName'];
-
       if (response.statusCode == 200) {
-      print('The album $deletedAlbumName deleted successfully');
-      return true;
+        print('Album removed successfully.');
       } else {
-        print('Failed to delete the album $deletedAlbumName. Status code: ${response.statusCode}');
-        return false;
+        print('Failed to remove album. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        // Handle the error as needed
       }
     } catch (e) {
-      print('Error: $e');
-      return false;
+      print('Error removing album: $e');
+      // Handle the error as needed
+    }
+  }
+
+  // Remove artist by ID
+  Future<void> removeArtist(String artistId) async {
+    try {
+      String? tokenStorage = await storage.read(key: 'token');
+      final headers = {
+        'Authorization': 'Bearer $tokenStorage',
+      };
+
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:5000/artists/$artistId'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        print('Artist removed successfully.');
+      } else {
+        print('Failed to remove artist. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        // Handle the error as needed
+      }
+    } catch (e) {
+      print('Error removing artist: $e');
+      // Handle the error as needed
     }
   }
 }

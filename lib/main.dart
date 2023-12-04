@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:srs_mobile/pages/MainPage.dart';
 import 'package:srs_mobile/pages/home_page.dart';
 
 void main() {

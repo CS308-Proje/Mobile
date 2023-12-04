@@ -60,7 +60,7 @@ class _FriendsPageState extends State<FriendsPage>
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Error'),
-              content: Text('The ID field should not be empty.'),
+              content: const Text('The ID field should not be empty.'),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(30.0)),
                 side: BorderSide(color: Colors.red, width: 2.5),
@@ -207,7 +207,7 @@ class _FriendsPageState extends State<FriendsPage>
                       // Content for "Add" tab
                       Column(
                         children: [
-                          const SizedBox(height: 15.0),
+                          const SizedBox(height: 5.0),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: TextField(

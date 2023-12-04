@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../pages/friends_page.dart';
-import '../pages/music_add_remove_page.dart';
+//import '../pages/music_add_remove_page.dart';
+import '../pages/add_remove_page.dart';
 import '../pages/main_page_content.dart';
 
 class MainPage extends StatefulWidget {
@@ -46,6 +47,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF171717),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         title: Image.asset(
