@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../pages/music_add_remove_page.dart';
+import '../pages/friends_page.dart';
+//import '../pages/music_add_remove_page.dart';
+import '../pages/add_remove_page.dart';
 import '../pages/main_page_content.dart';
 
 class MainPage extends StatefulWidget {
@@ -29,7 +31,7 @@ class _MainPageState extends State<MainPage> {
       _placeholderWidget(), // Index 0
       const AddRemovePage(), // Index 1 - Add-Remove page
       const MainPageContent(), // Index 2 - Home page content
-      _placeholderWidget(), // Index 3
+      const FriendsPage(), // Index 3
       _placeholderWidget(), // Index 4
     ]);
   }
@@ -45,6 +47,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF171717),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         title: Image.asset(

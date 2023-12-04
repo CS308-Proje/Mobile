@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import '../apis/MySongs_Logic.dart';
 
 class AddMusicInfo extends StatefulWidget {
   const AddMusicInfo({super.key});
@@ -11,50 +14,79 @@ class _AddMusicInfoState extends State<AddMusicInfo> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String songName = '';
   String albumName = '';
-  String mainArtist = '';
-  String featuringArtists = '';
+  String mainArtistName = '';
+  String featuringArtistNames = '';
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      List<String> featuringArtistList = featuringArtists.isNotEmpty
-        ? featuringArtists.split(',').map((s) => s.trim()).toList()
-        : [];
-      
-      print('Song Name: $songName');
-      print('Album Name: $albumName');
-      print('Main Artist: $mainArtist');
-      print('Featuring Artists: $featuringArtistList');
+      // Split and trim the featuring artists string into a list
+      List<String> featuringArtistList = featuringArtistNames.isNotEmpty
+          ? featuringArtistNames.split(',').map((s) => s.trim()).toList()
+          : [];
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Song added successfully!'),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(30.0)),
-              side: BorderSide(color: Colors.green, width: 2.5),
-            ),
-            titleTextStyle: const TextStyle(fontSize: 25, color: Colors.green),
-            contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
-            backgroundColor: Colors.grey[800],
-            actions: <Widget>[
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.green, // Color for text
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+      // Call the API service to add the song
+      bool isAdded = await SongService().addSongInfo(songName, mainArtistName, featuringArtistList, albumName);
+
+      if (isAdded) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Success'),
+              content: const Text('Song added successfully!'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                side: BorderSide(color: Colors.green, width: 2.5),
               ),
-            ],
-          );
-        },
-      );
+              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.green),
+              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              backgroundColor: Colors.grey[800],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.green, // Color for text
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                ),
+              ],
+            );
+          },
+        );
+      } else{
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Failed to add song. The song you tried to add already exists.'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                side: BorderSide(color: Colors.red, width: 2.5),
+              ),
+              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              backgroundColor: Colors.grey[800],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -98,22 +130,12 @@ class _AddMusicInfoState extends State<AddMusicInfo> {
               const SizedBox(height: 20,),
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Album Name', 
-                  labelStyle: TextStyle(fontSize: 20, color: Colors.green)
-                ), 
-                style: const TextStyle(fontSize: 20, color: Colors.white),
-                validator: (value) => value!.isEmpty ? 'Please enter album name' : null,
-                onSaved: (value) => albumName = value!,
-              ),
-              const SizedBox(height: 20,),
-              TextFormField(
-                decoration: const InputDecoration(
                   labelText: 'Main Artist Name', 
                   labelStyle: TextStyle(fontSize: 20, color: Colors.green)
                 ), 
                 style: const TextStyle(fontSize: 20, color: Colors.white),
                 validator: (value) => value!.isEmpty ? 'Please enter main artist name' : null,
-                onSaved: (value) => mainArtist = value!,
+                onSaved: (value) => mainArtistName = value!,
               ),
               const SizedBox(height: 20,),
               TextFormField(
@@ -123,7 +145,17 @@ class _AddMusicInfoState extends State<AddMusicInfo> {
                   ), 
                 style: const TextStyle(fontSize: 20, color: Colors.white),
                 validator: (value) => value!.isEmpty ? 'Please enter featuring artist names' : null,
-                onSaved: (value) => featuringArtists = value ?? '',
+                onSaved: (value) => featuringArtistNames = value ?? '',
+              ),
+              const SizedBox(height: 20,),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Album Name', 
+                  labelStyle: TextStyle(fontSize: 20, color: Colors.green)
+                ), 
+                style: const TextStyle(fontSize: 20, color: Colors.white),
+                validator: (value) => value!.isEmpty ? 'Please enter album name' : null,
+                onSaved: (value) => albumName = value!,
               ),
               const SizedBox(height: 40),
               ElevatedButton(

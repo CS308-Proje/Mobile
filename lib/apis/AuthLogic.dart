@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import '../pages/MainPage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // secure storage
 
-final storage =
-    new FlutterSecureStorage(); // Create an instance of secure storage
+const storage =
+    FlutterSecureStorage(); // Create an instance of secure storage
 
 Future<void> loginRequest(
     // ****** LOGIN REQUEST
     BuildContext context,
     String email,
     String password) async {
-  var url = Uri.parse('http://localhost:5001/auth/login');
+  var url = Uri.parse('http://10.0.2.2:5000/auth/login');
   var data = {'email': email, 'password': password};
 
   try {
@@ -66,7 +66,7 @@ Future<void> registerRequest(
     String email,
     String password) async {
   var url = Uri.parse(
-      'http://localhost:5001/auth/register'); // Modify the endpoint if needed
+      'http://10.0.2.2:5000/auth/register'); // Modify the endpoint if needed
   var data = {
     'name':
         username, // Using the provided username for both 'name' and 'username'
@@ -120,7 +120,7 @@ Future<void> registerRequest(
 }
 
 Future<void> fetchAndStoreUserData() async {
-  var url = Uri.parse('http://localhost:5001/auth/me');
+  var url = Uri.parse('http://10.0.2.2:5000/auth/me');
   String? token = await storage.read(key: 'token');
 
   var response = await http.get(
