@@ -96,7 +96,7 @@ class _MusicList extends StatelessWidget {
       future: songService.fetchSongs(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -119,7 +119,7 @@ class _MusicList extends StatelessWidget {
 class _MusicCard extends StatefulWidget {
   final Song song;
 
-  const _MusicCard({Key? key, required this.song}) : super(key: key);
+  const _MusicCard({required this.song});
 
   @override
   __MusicCardState createState() => __MusicCardState();
@@ -127,7 +127,7 @@ class _MusicCard extends StatefulWidget {
 
 class __MusicCardState extends State<_MusicCard> {
   double _rating = 0;
-  double _previousRating = 0;
+  final double _previousRating = 0;
 
   Future<void> _updateRating(double rating) async {
     String? userId = await storage.read(key: 'userId');

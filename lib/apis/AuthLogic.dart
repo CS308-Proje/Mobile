@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import '../pages/MainPage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // secure storage
 
-final storage =
-    new FlutterSecureStorage(); // Create an instance of secure storage
+const storage = FlutterSecureStorage(); // Create an instance of secure storage
 
 Future<void> loginRequest(
     // ****** LOGIN REQUEST
