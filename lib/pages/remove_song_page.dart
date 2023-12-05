@@ -83,13 +83,16 @@ class _RemoveSongListState extends State<RemoveSongList> {
       // Use appropriate function based on the type
       switch (widget.type) {
         case RemoveType.song:
-          await SongService().removeSong(item.id); // Adjust the property based on your model
+          await SongService()
+              .removeSong(item.id); // Adjust the property based on your model
           break;
         case RemoveType.album:
-          await SongService().removeAlbum(item.id); // Adjust the property based on your model
+          await SongService()
+              .removeAlbum(item.id); // Adjust the property based on your model
           break;
         case RemoveType.artist:
-          await SongService().removeArtist(item.id); // Adjust the property based on your model
+          await SongService()
+              .removeArtist(item.id); // Adjust the property based on your model
           break;
       }
     } catch (e) {
@@ -114,8 +117,12 @@ class _RemoveSongListState extends State<RemoveSongList> {
         ListTile(
           title: Text(
             itemName,
-            style: const TextStyle(color: Colors.white,),
+            style: const TextStyle(
+              color: Colors.white,
+            ),
           ),
+          trailing: Icon(Icons.remove, color: Colors.red), // Added '-' symbol
+
           onTap: () async {
             bool removeConfirmed = await showDialog(
               context: context,
@@ -123,25 +130,32 @@ class _RemoveSongListState extends State<RemoveSongList> {
                 return AlertDialog(
                   backgroundColor: Colors.grey[800],
                   title: const Text('Confirmation'),
-                  titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+                  titleTextStyle:
+                      const TextStyle(fontSize: 25, color: Colors.white70),
                   content: Text('Are you sure you want to remove $itemName?'),
-                  contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                  contentTextStyle:
+                      const TextStyle(fontSize: 20, color: Colors.white),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                    side: BorderSide(color: Colors.red, width: 2.5),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop(false); // Cancel removal
                       },
-                      child: const Text('Cancel', style: TextStyle(color: Colors.blue, fontSize: 20.0),),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.blue, fontSize: 20.0),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop(true); // Confirm removal
                       },
-                      child: const Text('Remove', style: TextStyle(color: Colors.red, fontSize: 20.0),),
+                      child: const Text(
+                        'Remove',
+                        style: TextStyle(color: Colors.red, fontSize: 20.0),
+                      ),
                     ),
                   ],
                 );
@@ -160,7 +174,9 @@ class _RemoveSongListState extends State<RemoveSongList> {
 
       // Add a separator after each item, except for the last one
       if (i < items.length - 1) {
-        listItems.add(const Divider(color: Colors.green,));
+        listItems.add(const Divider(
+          color: Colors.green,
+        ));
       }
     }
     return listItems;
@@ -178,10 +194,20 @@ class _RemoveSongListState extends State<RemoveSongList> {
             onChanged: (value) {
               setState(() {
                 _futureItems = _fetchItems().then((items) {
-                  return items.where((item) =>
-                      (widget.type == RemoveType.song && item.songName.toLowerCase().contains(value.toLowerCase())) ||
-                      (widget.type == RemoveType.album && item.name.toLowerCase().contains(value.toLowerCase())) ||
-                      (widget.type == RemoveType.artist && item.artistName.toLowerCase().contains(value.toLowerCase())))
+                  return items
+                      .where((item) =>
+                          (widget.type == RemoveType.song &&
+                              item.songName
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase())) ||
+                          (widget.type == RemoveType.album &&
+                              item.name
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase())) ||
+                          (widget.type == RemoveType.artist &&
+                              item.artistName
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase())))
                       .toList();
                 });
               });

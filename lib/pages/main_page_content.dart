@@ -127,7 +127,6 @@ class _MusicCard extends StatefulWidget {
 
 class __MusicCardState extends State<_MusicCard> {
   double _rating = 0;
-  final double _previousRating = 0;
 
   Future<void> _updateRating(double rating) async {
     String? userId = await storage.read(key: 'userId');
