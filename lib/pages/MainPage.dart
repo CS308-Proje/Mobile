@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../pages/friends_page.dart';
-//import '../pages/music_add_remove_page.dart';
 import '../pages/add_remove_page.dart';
 import '../pages/main_page_content.dart';
 
@@ -28,11 +27,11 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _widgetOptions.addAll([
-      _placeholderWidget(),    // Index 0
-      const AddRemovePage(),   // Index 1 - Add-Remove page
+      _placeholderWidget(), // Index 0
+      const AddRemovePage(), // Index 1 - Add-Remove page
       const MainPageContent(), // Index 2 - Home page content
-      const FriendsPage(),     // Index 3 - Friends page
-      _placeholderWidget(),    // Index 4
+      const FriendsPage(), // Index 3 - Friends page
+      _placeholderWidget(), // Index 4
     ]);
   }
 

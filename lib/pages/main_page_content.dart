@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../models/songModel.dart';
-import '../apis/MySongs_Logic.dart';
+import '../models/songModel.dart'; // Update this import according to your model structure
+import '../models/albumModel.dart'; // You need to create this
+import '../models/artistModel.dart'; // You need to create this
+import '../apis/MySongs_Logic.dart'; // Update this import according to your service structure
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../apis/RatingLogic.dart';
 import '../apis/AuthLogic.dart';
+
+// Enum for different data types
+enum DataType { songs, albums, artists }
 
 class MainPageContent extends StatelessWidget {
   const MainPageContent({super.key});
@@ -27,23 +32,21 @@ class MainPageContent extends StatelessWidget {
               child: const TextField(
                 decoration: InputDecoration(
                   hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.white),
                   border: InputBorder.none,
                   suffixIcon: Icon(Icons.search, color: Colors.white),
                 ),
               ),
             ),
             const SizedBox(height: 20.0),
+            const _SectionHeader(title: 'Songs', route: '/songs'),
+            const _MusicList(dataType: DataType.songs),
 
-            // Liked Songs Section
-            const _SectionHeader(title: 'Liked Songs', route: '/liked_songs'),
-            const _MusicList(),
+            const _SectionHeader(title: 'Albums', route: '/albums'),
+            const _MusicList(dataType: DataType.albums),
 
-            // Recommendations Section
-            const _SectionHeader(
-                title: 'Recommendations', route: '/recommendations'),
-            const _MusicList(),
-
-            // Additional sections can be added here
+            const _SectionHeader(title: 'Artists', route: '/artists'),
+            const _MusicList(dataType: DataType.artists),
           ],
         ),
       ),
@@ -86,14 +89,30 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _MusicList extends StatelessWidget {
-  const _MusicList();
+  final DataType dataType;
+
+  const _MusicList({Key? key, required this.dataType}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final songService = SongService();
+    final songService =
+        SongService(); // Assuming this service can handle different data types
 
-    return FutureBuilder<List<Song>>(
-      future: songService.fetchSongs(),
+    Future<List<dynamic>> fetchData() {
+      switch (dataType) {
+        case DataType.songs:
+          return songService.fetchSongs();
+        case DataType.albums:
+          return songService.fetchAlbums(); // Implement this method
+        case DataType.artists:
+          return songService.fetchArtists(); // Implement this method
+        default:
+          throw Exception('Invalid data type');
+      }
+    }
+
+    return FutureBuilder<List<dynamic>>(
+      future: fetchData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -106,7 +125,8 @@ class _MusicList extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: snapshot.data?.length ?? 0,
               itemBuilder: (context, index) {
-                return _MusicCard(song: snapshot.data![index]);
+                var item = snapshot.data![index];
+                return _MusicCard(item: item);
               },
             ),
           );
@@ -117,9 +137,9 @@ class _MusicList extends StatelessWidget {
 }
 
 class _MusicCard extends StatefulWidget {
-  final Song song;
+  final dynamic item;
 
-  const _MusicCard({required this.song});
+  const _MusicCard({Key? key, required this.item}) : super(key: key);
 
   @override
   __MusicCardState createState() => __MusicCardState();
@@ -128,18 +148,64 @@ class _MusicCard extends StatefulWidget {
 class __MusicCardState extends State<_MusicCard> {
   double _rating = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the _rating based on the item's ratingValue
+    if (widget.item is Song) {
+      _rating = (widget.item as Song).ratingValue?.toDouble() ?? 0.0;
+    } else if (widget.item is Album) {
+      _rating = (widget.item as Album).ratingValue?.toDouble() ?? 0.0;
+    } else if (widget.item is Artist) {
+      _rating = (widget.item as Artist).ratingValue?.toDouble() ?? 0.0;
+    } else {
+      _rating = 0.0; // Default value if the item type is not recognized
+    }
+  }
+
   Future<void> _updateRating(double rating) async {
     String? userId = await storage.read(key: 'userId');
     if (userId != null) {
-      rateSong(widget.song.id, userId, rating.toInt());
+      try {
+        if (widget.item is Song) {
+          // Rate a song
+          await rateItem(widget.item.id, RatingType.song, rating.toInt());
+        } else if (widget.item is Album) {
+          // Rate an album
+          await rateItem(widget.item.id, RatingType.album, rating.toInt());
+        } else if (widget.item is Artist) {
+          // Rate an artist
+          await rateItem(widget.item.id, RatingType.artist, rating.toInt());
+        }
+      } catch (e) {
+        print('Error in rating: $e');
+      }
     } else {
       print('User ID not found');
-      // Handle user ID not found
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Determine the type of the item and extract the relevant data for display
+    String title, imageUrl;
+    if (widget.item is Song) {
+      Song song = widget.item as Song;
+      title = song.songName;
+      imageUrl = song.albumImg;
+    } else if (widget.item is Album) {
+      Album album = widget.item as Album;
+      title = album.name;
+      imageUrl = album.albumImg;
+    } else if (widget.item is Artist) {
+      Artist artist = widget.item as Artist;
+      title = artist.artistName;
+      imageUrl = artist.artistImg;
+    } else {
+      // Fallback for unknown item type
+      return const SizedBox.shrink();
+    }
+
     return Container(
       width: 130.0,
       margin: const EdgeInsets.only(right: 15.0),
@@ -150,15 +216,17 @@ class __MusicCardState extends State<_MusicCard> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Image.network(widget.song.albumImg,
-              height: 80.0), // Display album image
-          Text(widget.song.songName,
-              style: const TextStyle(color: Colors.white)), // Display song name
+          Image.network(imageUrl, height: 80.0),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
           RatingBar.builder(
             initialRating: _rating,
             minRating: 1,
             direction: Axis.horizontal,
-            allowHalfRating: true,
+            allowHalfRating: false,
             itemCount: 5,
             itemSize: 16.0,
             itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -171,7 +239,7 @@ class __MusicCardState extends State<_MusicCard> {
                 setState(() {
                   _rating = rating;
                 });
-                _updateRating(rating); // Call the new method for rating update
+                _updateRating(rating);
               }
             },
           ),

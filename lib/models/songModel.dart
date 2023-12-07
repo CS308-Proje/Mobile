@@ -4,6 +4,7 @@ class Song {
   final String mainArtistName;
   final String albumName;
   final String albumImg;
+  final int? ratingValue;
 
   Song({
     required this.id,
@@ -11,6 +12,7 @@ class Song {
     required this.mainArtistName,
     required this.albumName,
     required this.albumImg,
+    required this.ratingValue,
   });
 
   factory Song.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Song {
       mainArtistName: json['mainArtistName'],
       albumName: json['albumName'],
       albumImg: json['albumImg'],
+      ratingValue: json['ratingValue'],
     );
   }
 }

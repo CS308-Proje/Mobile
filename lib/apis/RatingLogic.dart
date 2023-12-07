@@ -2,17 +2,31 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'AuthLogic.dart';
 
-Future<void> rateSong(String songId, String userId, int ratingValue) async {
-  var url = Uri.parse('http://localhost:5001/rating/rateSong');
-  String? token = await storage.read(key: 'token'); // Retrieve the token
+enum RatingType { song, album, artist }
 
+Future<void> rateItem(
+    String itemId, RatingType ratingType, int ratingValue) async {
+  Uri url;
+  switch (ratingType) {
+    case RatingType.song:
+      url = Uri.parse('http://localhost:5001/rating/rateSong/$itemId');
+      break;
+    case RatingType.album:
+      url = Uri.parse('http://localhost:5001/rating/rateAlbum/$itemId');
+      break;
+    case RatingType.artist:
+      url = Uri.parse('http://localhost:5001/rating/rateArtist/$itemId');
+      break;
+    default:
+      throw Exception('Invalid rating type');
+  }
+
+  String? token = await storage.read(key: 'token'); // Retrieve the token
   var headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer $token', // Include the token here
   };
   var body = json.encode({
-    'songId': songId,
-    'userId': userId,
     'ratingValue': ratingValue,
   });
 
