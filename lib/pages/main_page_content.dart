@@ -146,7 +146,7 @@ class _MusicCard extends StatefulWidget {
 }
 
 class __MusicCardState extends State<_MusicCard> {
-  double _rating = 0;
+  late double _rating = 0;
 
   @override
   void initState() {
@@ -236,10 +236,12 @@ class __MusicCardState extends State<_MusicCard> {
             ),
             onRatingUpdate: (rating) {
               if (_rating != rating) {
+                // item is rated here as well
                 setState(() {
-                  _rating = rating;
-                });
-                _updateRating(rating);
+                  // item is rated here as well
+                  _rating = rating; // item is rated here as well
+                }); // item is rated here as well
+                _updateRating(rating); // item is rated here as well
               }
             },
           ),
