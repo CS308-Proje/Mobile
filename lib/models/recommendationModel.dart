@@ -1,7 +1,6 @@
 class RecommendationModel {
   final String songName;
   final String mainArtistName;
-
   final String albumImg;
 
   RecommendationModel({

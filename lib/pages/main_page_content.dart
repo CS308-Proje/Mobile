@@ -11,48 +11,91 @@ import '../apis/AuthLogic.dart';
 // Enum for different data types
 enum DataType { songs, albums, artists }
 
-class MainPageContent extends StatelessWidget {
+class MainPageContent extends StatefulWidget {
   const MainPageContent({super.key});
 
   @override
+  _MainPageContentState createState() => _MainPageContentState();
+}
+
+class _MainPageContentState extends State<MainPageContent> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  late Future<List<dynamic>> songsFuture;
+  late Future<List<dynamic>> albumsFuture;
+  late Future<List<dynamic>> artistsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
+    // Initialize your data fetching here
+    final songService = SongService();
+    songsFuture = songService.fetchSongs();
+    albumsFuture = songService.fetchAlbums();
+    artistsFuture = songService.fetchArtists();
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      // Reload data
+      _loadData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[800],
-                borderRadius: BorderRadius.circular(30.0),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.white),
-                  border: InputBorder.none,
-                  suffixIcon: Icon(Icons.search, color: Colors.white),
+    return RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: _refreshData,
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Search Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.white),
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search, color: Colors.white),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            const _SectionHeader(title: 'Songs', route: '/songs'),
-            const _MusicList(dataType: DataType.songs),
+              const SizedBox(height: 20.0),
 
-            const _SectionHeader(title: 'Albums', route: '/albums'),
-            const _MusicList(dataType: DataType.albums),
+              _SectionHeader(title: 'Songs', route: '/songs'),
+              _MusicList(dataType: DataType.songs, dataFuture: songsFuture),
 
-            const _SectionHeader(title: 'Artists', route: '/artists'),
-            const _MusicList(dataType: DataType.artists),
-          ],
+              _SectionHeader(title: 'Albums', route: '/albums'),
+              _MusicList(dataType: DataType.albums, dataFuture: albumsFuture),
+
+              _SectionHeader(title: 'Artists', route: '/artists'),
+              _MusicList(dataType: DataType.artists, dataFuture: artistsFuture),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+/*
+  
+ */
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -90,29 +133,15 @@ class _SectionHeader extends StatelessWidget {
 
 class _MusicList extends StatelessWidget {
   final DataType dataType;
+  final Future<List<dynamic>> dataFuture;
 
-  const _MusicList({Key? key, required this.dataType}) : super(key: key);
+  const _MusicList({Key? key, required this.dataType, required this.dataFuture})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final songService =
-        SongService(); // Assuming this service can handle different data types
-
-    Future<List<dynamic>> fetchData() {
-      switch (dataType) {
-        case DataType.songs:
-          return songService.fetchSongs();
-        case DataType.albums:
-          return songService.fetchAlbums(); // Implement this method
-        case DataType.artists:
-          return songService.fetchArtists(); // Implement this method
-        default:
-          throw Exception('Invalid data type');
-      }
-    }
-
     return FutureBuilder<List<dynamic>>(
-      future: fetchData(),
+      future: dataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
