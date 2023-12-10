@@ -1,34 +1,16 @@
-# Mobile Part of the SRS - Song Recommendation System
+# srs_mobile
 
-## Done:
+A new Flutter project.
 
-* Login UI part is done.
-* Register UI part is done.
-* Back-end connection done for register/login UI
-* Home Page UI part is done.
-* Main Page UI part is done.
-* Bottom navigation menu and segueways implementation part is done.
-* 
+## Getting Started
 
-## In Progress:
+This project is a starting point for a Flutter application.
 
-* Back-end connection for adding, removing & updatings songs.
-* Display the songs from the database on MainPage.
-* 
+A few resources to get you started if this is your first Flutter project:
 
-## Will Do:
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-* Forgot password extension.
-* Sign in with Google or Apple account.
-* Register with Google or Apple account.
-* Statistics UI
-* Friends UI
-* User Details UI
-* 
-
-## Guide:
-For starting the code type the following lines to terminal
-
-* flutter pub get
-* flutter doctor (if you see an error)
-* flutter run
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

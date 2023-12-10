@@ -1,0 +1,108 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter pub get
+
+## exception
+
+PathAccessException: PathAccessException: Cannot open file, path = 'C:\Users\batur\Desktop\NEW\windows\flutter\generated_plugin_registrant.h' (OS Error: Dosya başka bir işlem tarafından kullanıldığından bu işlem dosyaya erişemiyor.
+, errno = 32)
+
+```
+#0      _checkForErrorResponse (dart:io/common.dart:55:9)
+#1      _File.open.<anonymous closure> (dart:io/file_impl.dart:381:7)
+#2      _rootRunUnary (dart:async/zone.dart:1407:47)
+#3      _CustomZone.runUnary (dart:async/zone.dart:1308:19)
+<asynchronous suspension>
+#4      _File.writeAsBytes.<anonymous closure> (dart:io/file_impl.dart:634:34)
+<asynchronous suspension>
+#5      ForwardingFile.writeAsString (package:file/src/forwarding/forwarding_file.dart:136:12)
+<asynchronous suspension>
+#6      ErrorHandlingFile.writeAsString.<anonymous closure> (package:flutter_tools/src/base/error_handling_io.dart:247:24)
+<asynchronous suspension>
+#7      _run (package:flutter_tools/src/base/error_handling_io.dart:559:12)
+<asynchronous suspension>
+#8      _renderTemplateToFile (package:flutter_tools/src/flutter_plugins.dart:38:3)
+<asynchronous suspension>
+#9      _writeCppPluginRegistrant (package:flutter_tools/src/flutter_plugins.dart:940:3)
+<asynchronous suspension>
+#10     writeWindowsPluginFiles (package:flutter_tools/src/flutter_plugins.dart:935:3)
+<asynchronous suspension>
+#11     injectPlugins (package:flutter_tools/src/flutter_plugins.dart:1176:5)
+<asynchronous suspension>
+#12     FlutterProject.ensureReadyForPlatformSpecificTooling (package:flutter_tools/src/project.dart:378:5)
+<asynchronous suspension>
+#13     PackagesGetCommand.runCommand (package:flutter_tools/src/commands/packages.dart:365:7)
+<asynchronous suspension>
+#14     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1350:27)
+<asynchronous suspension>
+#15     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#16     CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+<asynchronous suspension>
+#17     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:348:9)
+<asynchronous suspension>
+#18     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#19     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:294:5)
+<asynchronous suspension>
+#20     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:112:9)
+<asynchronous suspension>
+#21     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#22     main (package:flutter_tools/executable.dart:90:3)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[32m[✓][39m Flutter (Channel stable, 3.16.1, on Microsoft Windows [Version 10.0.19045.3693], locale tr-TR)
+    [32m•[39m Flutter version 3.16.1 on channel stable at C:\Users\batur\Documents\flutter
+    [32m•[39m Upstream repository https://github.com/flutter/flutter.git
+    [32m•[39m Framework revision 7f20e5d18c (13 days ago), 2023-11-27 09:47:30 -0800
+    [32m•[39m Engine revision 22b600f240
+    [32m•[39m Dart version 3.2.1
+    [32m•[39m DevTools version 2.28.3
+
+[32m[✓][39m Windows Version (Installed version of Windows is version 10 or higher)
+
+[32m[✓][39m Android toolchain - develop for Android devices (Android SDK version 34.0.0)
+    [32m•[39m Android SDK at C:\Users\batur\AppData\Local\Android\sdk
+    [32m•[39m Platform android-34, build-tools 34.0.0
+    [32m•[39m Java binary at: C:\Program Files\Android\Android Studio\jbr\bin\java
+    [32m•[39m Java version OpenJDK Runtime Environment (build 17.0.6+0-b2043.56-10027231)
+    [32m•[39m All Android licenses accepted.
+
+[32m[✓][39m Chrome - develop for the web
+    [32m•[39m Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[32m[✓][39m Visual Studio - develop Windows apps (Visual Studio Community 2022 17.8.0)
+    [32m•[39m Visual Studio at C:\Program Files\Microsoft Visual Studio\2022\Community
+    [32m•[39m Visual Studio Community 2022 version 17.8.34309.116
+    [32m•[39m Windows 10 SDK version 10.0.22621.0
+
+[32m[✓][39m Android Studio (version 2022.3)
+    [32m•[39m Android Studio at C:\Program Files\Android\Android Studio
+    [32m•[39m Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    [32m•[39m Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    [32m•[39m Java version OpenJDK Runtime Environment (build 17.0.6+0-b2043.56-10027231)
+
+[32m[✓][39m VS Code (version 1.85.0)
+    [32m•[39m VS Code at C:\Users\batur\AppData\Local\Programs\Microsoft VS Code
+    [32m•[39m Flutter extension version 3.78.0
+
+[32m[✓][39m Connected device (3 available)
+    [32m•[39m Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.19045.3693]
+    [32m•[39m Chrome (web)      • chrome  • web-javascript • Google Chrome 120.0.6099.71
+    [32m•[39m Edge (web)        • edge    • web-javascript • Microsoft Edge 120.0.2210.61
+
+[32m[✓][39m Network resources
+    [32m•[39m All expected network resources are available.
+
+[32m•[39m No issues found!
+```
