@@ -1,8 +1,11 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:srs_mobile/apis/MySongs_Logic.dart';
+
+enum ExportType { CSV, JSON, TXT }
 
 class ExportDataPage extends StatefulWidget {
   const ExportDataPage({Key? key}) : super(key: key);
@@ -14,6 +17,7 @@ class ExportDataPage extends StatefulWidget {
 class _ExportDataPageState extends State<ExportDataPage> {
   late TextEditingController _artistController;
   late TextEditingController _ratingController;
+  ExportType _selectedExportType = ExportType.JSON; // Default export type
 
   @override
   void initState() {
@@ -38,7 +42,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
       }
 
       if (rating.isNotEmpty) {
-        // Check if the rating is within the range [0, 5]
         double ratingValue = double.tryParse(rating) ?? -1;
         if (ratingValue < 0 || ratingValue > 5) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -53,19 +56,29 @@ class _ExportDataPageState extends State<ExportDataPage> {
 
       List<dynamic> exportData = await SongService().fetchExportData(artist, rating);
 
-      // Check if there's data to export
-      if (exportData.isEmpty) {
+      if (_selectedExportType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No data found to export.'),
-            backgroundColor: Colors.yellow,
+            content: Text('Please select an export type.'),
+            backgroundColor: Colors.red,
           ),
         );
         return;
       }
 
-      // Print debug information
-      print('Exported Data: $exportData');
+      String fileName;
+
+      switch (_selectedExportType) {
+        case ExportType.CSV:
+          fileName = 'data_$artist-$rating.csv';
+          break;
+        case ExportType.JSON:
+          fileName = 'data_$artist-$rating.json';
+          break;
+        case ExportType.TXT:
+          fileName = 'data_$artist-$rating.txt';
+          break;
+      }
 
       // Set the download directory
 
@@ -73,30 +86,12 @@ class _ExportDataPageState extends State<ExportDataPage> {
       Directory generalDownloadDir = Directory('/storage/emulated/0/Download');
       
       // TRY FOR IOS
-      //Directory generalDownloadDir = await getApplicationDocumentsDirectory();
+      //Directory? generalDownloadDir = await getDownloadsDirectory();
 
       // Generate a file name based on artist or rating
-      String fileName;
-
-      if (artist.isNotEmpty && rating.isNotEmpty) {
-        // If both artist and rating are provided
-        fileName = 'data_$artist-$rating.txt';
-      } else if (artist.isNotEmpty) {
-        // If only artist is provided
-        fileName = 'artist_data-$artist.txt';
-      } else if (rating.isNotEmpty) {
-        // If only rating is provided
-        fileName = 'rating_data-$rating.txt';
-      } else {
-        // This case shouldn't happen, but handle it just in case
-        fileName = 'default_data.txt';
-      }
-
-      // Save the exported data to a JSON file in the external storage directory
       File exportFile = File('${generalDownloadDir.path}/$fileName');
-      await exportFile.writeAsString(jsonEncode(exportData));
-      
-      // Print the location and name of the exported file
+      await exportFile.writeAsString(_encodeData(exportData, _selectedExportType));
+
       print('Exported file location: ${generalDownloadDir.path}');
       print('Exported file name: $fileName');
 
@@ -108,7 +103,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
       );
     } catch (e) {
       print('Error exporting data: $e');
-      // Show an error snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to export data.'),
@@ -116,6 +110,34 @@ class _ExportDataPageState extends State<ExportDataPage> {
         ),
       );
     }
+  }
+
+  String _encodeData(List<dynamic> data, ExportType exportType) {
+    switch (exportType) {
+      case ExportType.CSV:
+        return _encodeDataToCSV(data);
+      case ExportType.JSON:
+        return jsonEncode(data);
+      case ExportType.TXT:
+        return _encodeDataToTXT(data);
+    }
+  }
+
+  String _encodeDataToCSV(List<dynamic> data) {
+    List<List<dynamic>> rows = [];
+
+    rows.add(data.first.keys.toList());
+
+    for (var entry in data) {
+      rows.add(entry.values.toList());
+    }
+
+    return const ListToCsvConverter().convert(rows);
+  }
+
+  String _encodeDataToTXT(List<dynamic> data) {
+    String jsonString = jsonEncode(data);
+    return jsonString.replaceAll(',', ',\n');
   }
 
   @override
@@ -138,13 +160,31 @@ class _ExportDataPageState extends State<ExportDataPage> {
               controller: _ratingController,
               decoration: const InputDecoration(labelText: 'Rating', labelStyle: TextStyle(color: Colors.green)),
             ),
+            const SizedBox(height: 20),
+            DropdownButton<ExportType>(
+              value: _selectedExportType,
+              dropdownColor: Colors.grey[800],
+              style: const TextStyle(color: Colors.white, fontSize: 16.0),
+              onChanged: (ExportType? newValue) {
+                setState(() {
+                  _selectedExportType = newValue!;
+                });
+              },
+              items: 
+                ExportType.values.map<DropdownMenuItem<ExportType>>((ExportType value) {
+                  return DropdownMenuItem<ExportType>(
+                    value: value,
+                    child: Text(value.toString().split('.').last),
+                  );
+                }).toList(),
+            ),
             const SizedBox(height: 25),
             ElevatedButton(
               onPressed: _exportData,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[800], // Background color
-                foregroundColor: Colors.white, // Text color
-                side: const BorderSide(color: Colors.green, width: 2), // Border color
+                backgroundColor: Colors.grey[800],
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: Colors.green, width: 2),
               ),
               child: const Text('Export Data', style: TextStyle(color: Colors.white, fontSize: 18.0)),
             ),
