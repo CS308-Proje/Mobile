@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/friendModel.dart';
+import '../models/invitationModel.dart';
 import '../apis/MyFriends_Logic.dart';
 
 class FriendsPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _FriendsPageState extends State<FriendsPage>
   String? userId;
   List<Friend> friends = [];
   List<Friend> filteredFriends = [];
+  List<Invitation> invitations = [];
   TextEditingController searchController = TextEditingController();
   TextEditingController addFriendController = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
@@ -22,19 +24,20 @@ class _FriendsPageState extends State<FriendsPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _fetchUserId();
+    _fetchUserInvitations();
   }
 
   Future<void> _fetchUserId() async {
     userId = await storage.read(key: 'userId');
     if (userId != null) {
-      _fetchUserFriends(userId!);
+      _fetchUserFriends();
     }
   }
 
-  Future<void> _fetchUserFriends(String userId) async {
-    final userFriends = await MyFriendsLogic().fetchUserFriends(userId);
+  Future<void> _fetchUserFriends() async {
+    final userFriends = await MyFriendsLogic().fetchUserFriends();
 
     setState(() {
       friends = userFriends;
@@ -42,19 +45,44 @@ class _FriendsPageState extends State<FriendsPage>
     });
   }
 
-  void _filterItems(String keyword) {
-    setState(() {
-      filteredFriends = friends.where((friend) {
-        return friend.name.toLowerCase().contains(keyword.toLowerCase()) ||
-            friend.username.toLowerCase().contains(keyword.toLowerCase());
-      }).toList();
-    });
+  Future<void> _fetchUserInvitations() async {
+    try {
+      List<Invitation> fetchedInvitations = await MyFriendsLogic().fetchUserInvitations();
+
+      setState(() {
+        invitations = fetchedInvitations;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+  
+  Future<void> _acceptFriendRequest(Invitation invitation) async {
+    try {
+      await MyFriendsLogic().addFriendById(invitation.targetUserId, invitation.userId);
+      await MyFriendsLogic().updateInvitationStatus(invitation.id, 'accepted');
+
+      _fetchUserFriends();
+      _fetchUserInvitations();
+    } catch (e) {
+      print('Error accepting friend request: $e');
+    }
   }
 
-  void _addFriend() async {
+  Future<void> _rejectFriendRequest(Invitation invitation) async {
+    try {
+      await MyFriendsLogic().updateInvitationStatus(invitation.id, 'rejected');
+      _fetchUserFriends();
+      _fetchUserInvitations();
+    } catch (e) {
+      print('Error rejecting friend request: $e');
+    }
+  }
+
+  Future<void> _sendFriendRequest() async {
     if (userId != null) {
       final enteredFriendId = addFriendController.text;
-      if (enteredFriendId.isEmpty){
+      if (enteredFriendId.isEmpty) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -85,43 +113,14 @@ class _FriendsPageState extends State<FriendsPage>
           },
         );
       } else {
-        if (friends.any((friend) => friend.id == enteredFriendId)) {
-        // Show a dialog indicating that the friend already exists
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: Text('The friend with ID "$enteredFriendId" is already in your friends list.'),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                side: BorderSide(color: Colors.red, width: 2.5),
-              ),
-              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
-              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
-              backgroundColor: Colors.grey[800],
-              actions: <Widget>[
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                  onPressed: () {
-                    addFriendController.clear();
-                    FocusScope.of(context).unfocus();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-          await MyFriendsLogic().addFriendById(userId!, addFriendController.text);
-          _fetchUserFriends(userId!); // Reload friends after adding
-          addFriendController.clear();
-          FocusScope.of(context).unfocus();
+        try {
+          await MyFriendsLogic().sendFriendRequest(userId!, enteredFriendId);
+          print('Friend request sent successfully');
+        } catch (e) {
+          print('Error sending friend request: $e');
         }
+        addFriendController.clear();
+        FocusScope.of(context).unfocus();
       }
     }
   }
@@ -129,13 +128,24 @@ class _FriendsPageState extends State<FriendsPage>
   void _removeFriend(String friendId) async {
     if (userId != null) {
       await MyFriendsLogic().removeFriendById(userId!, friendId);
-      _fetchUserFriends(userId!); // Reload friends after removing
+      _fetchUserFriends();
       setState(() {
-        filteredFriends = filteredFriends.where((friend) => friend.id != friendId).toList();
+        filteredFriends =
+            filteredFriends.where((friend) => friend.id != friendId).toList();
       });
       searchController.clear();
       searchFocusNode.unfocus();
     }
+  }
+
+  void _filterItems(String keyword) {
+    setState(() {
+      filteredFriends = friends
+          .where((friend) =>
+              friend.name.toLowerCase().contains(keyword.toLowerCase()) ||
+              friend.username.toLowerCase().contains(keyword.toLowerCase()))
+          .toList();
+    });
   }
 
   void _showRemoveFriendDialog(BuildContext context, Friend friend) {
@@ -156,7 +166,7 @@ class _FriendsPageState extends State<FriendsPage>
             TextButton(
               child: const Text('Remove', style: TextStyle(color: Colors.red, fontSize: 20.0)),
               onPressed: () {
-                _removeFriend(friend.id); // Call the removal function
+                _removeFriend(friend.id);
                 Navigator.of(context).pop();
               },
             ),
@@ -185,6 +195,14 @@ class _FriendsPageState extends State<FriendsPage>
                       text: 'Add',
                       icon: Icon(
                         Icons.person_add,
+                        color: Colors.green,
+                        size: 20.0,
+                      ),
+                    ),
+                    Tab(
+                      text: 'Invitations',
+                      icon: Icon(
+                        Icons.mail,
                         color: Colors.green,
                         size: 20.0,
                       ),
@@ -247,10 +265,10 @@ class _FriendsPageState extends State<FriendsPage>
                             ),
                           ),
                           SizedBox(
-                            width: 180.0,
+                            width: 280.0,
                             height: 45.0,
                             child: ElevatedButton(
-                              onPressed: _addFriend,
+                              onPressed: _sendFriendRequest,
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.green, backgroundColor: Colors.grey[800],
                                 shape: RoundedRectangleBorder(
@@ -266,9 +284,9 @@ class _FriendsPageState extends State<FriendsPage>
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.person_add, color: Colors.green),
+                                    Icon(Icons.send_rounded, color: Colors.green),
                                     SizedBox(width: 10.0),
-                                    Text('Add Friend', style: TextStyle(color: Colors.white, fontSize: 18.0),),
+                                    Text('Send Friend Request', style: TextStyle(color: Colors.white, fontSize: 18.0),),
                                   ],
                                 ),
                               ),
@@ -276,29 +294,98 @@ class _FriendsPageState extends State<FriendsPage>
                           ),
                           const SizedBox(height: 20.0),
                           friends.isEmpty
-                              ? const Center(
-                                  //const SizedBox(height:20.0);
-                                  child: Column(children: [
-                                    SizedBox(height: 150.0,),
-                                    Text('No friends yet.', style: TextStyle(color: Colors.white, fontSize: 22.0),)
-                                  ],
+                            ? const Center(
+                                //const SizedBox(height:20.0);
+                                child: Column(children: [
+                                  SizedBox(height: 150.0,),
+                                  Text('No friends yet.', style: TextStyle(color: Colors.white, fontSize: 22.0),)
+                                ],
+                              ),
+                            )
+                            : Expanded(
+                                child: ListView.separated(
+                                  itemCount: friends.length,
+                                  separatorBuilder: (context, index) => const Divider(color: Colors.green),
+                                  itemBuilder: (context, index) {
+                                    final friend = friends[index];
+                                    return ListTile(
+                                      title: Text(friend.name, style: const TextStyle(color: Colors.green)),
+                                      subtitle: Text(friend.username, style: const TextStyle(color: Colors.white)),
+                                    );
+                                  },
                                 ),
-                              )
-                              : Expanded(
-                                  child: ListView.separated(
-                                    itemCount: friends.length,
-                                    separatorBuilder: (context, index) => const Divider(color: Colors.white),
+                              ),
+                        ],
+                      ),
+                      // Content for "Invitations" tab
+                      Column(
+                        children: [
+                          const SizedBox(height: 10.0),
+                          Expanded(
+                            child: invitations.isNotEmpty
+                                ? ListView.builder(
+                                    itemCount: invitations.length,
                                     itemBuilder: (context, index) {
-                                      final friend = friends[index];
-                                      return ListTile(
-                                        title: Text(friend.name, style: const TextStyle(color: Colors.green)),
-                                        subtitle: Text(friend.username, style: const TextStyle(color: Colors.white)),
+                                      final invitation = invitations[index];
+                                      return Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 5.0,
+                                          horizontal: 20.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[800],
+                                          borderRadius: BorderRadius.circular(15.0),
+                                        ),
+                                        child: ListTile(
+                                          title: Text(
+                                            'Friend request from ${invitation.userId}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16.0,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            'Status: ${invitation.status}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14.0,
+                                            ),
+                                          ),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () => _acceptFriendRequest(invitation),
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () => _rejectFriendRequest(invitation),
+                                                icon: const Icon(
+                                                  Icons.clear,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       );
                                     },
+                                  )
+                                : const Center(
+                                    child: Text(
+                                      'No friend invitations.',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20.0,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                          ),
                         ],
-                      ),             
+                      ),
                       // Content for "Remove" tab
                       Column(
                         children: [
@@ -341,7 +428,7 @@ class _FriendsPageState extends State<FriendsPage>
                           Expanded(
                             child: ListView.separated(
                               itemCount: filteredFriends.length,
-                              separatorBuilder: (context, index) => const Divider(color: Colors.white),
+                              separatorBuilder: (context, index) => const Divider(color: Colors.green),
                               itemBuilder: (context, index) {
                                 final friend = filteredFriends[index];
                                 return GestureDetector(

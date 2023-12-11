@@ -8,28 +8,23 @@ import '../models/albumModel.dart'; // Import the Album model
 
 class SongService {
   Future<List<Song>> fetchSongs() async {
-    try {
-      String? tokenStorage = await storage.read(key: 'token');
-      final headers = {
-        'Authorization': 'Bearer $tokenStorage',
-      };
+    String? tokenStorage = await storage.read(key: 'token');
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage',
+    };
 
-      final response = await http.get(
-        Uri.parse('http://localhost:5001/songs'),
-        headers: headers,
-      );
+    final response = await http.get(
+      Uri.parse('http://localhost:5001/songs'),
+      headers: headers,
+    );
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body) as Map<String, dynamic>;
-        var songs = data['songs'] as List;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      var data = json.decode(response.body) as Map<String, dynamic>;
+      var songs = data['songs'] as List;
 
-        return songs.map<Song>((json) => Song.fromJson(json)).toList();
-      } else {
-        print('Request failed with status: ${response.statusCode}.');
-        throw Exception('Failed to load songs');
-      }
-    } catch (e) {
-      print('Error fetching songs: $e');
+      return songs.map<Song>((json) => Song.fromJson(json)).toList();
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
       throw Exception('Failed to load songs');
     }
   }
@@ -109,7 +104,7 @@ class SongService {
 
     if (songExists) {
       print('Song already exists in the database. Skipping addition.');
-      return false; // Return false to indicate that the song was not added
+      return false;
     } else {
       final response = await http.post(
         Uri.parse('http://localhost:5001/songs'),
@@ -179,12 +174,10 @@ class SongService {
   Future<bool> transferSongs(
       String databaseURI, String databaseName, String collectionName) async {
     try {
-      String? tokenStorage =
-          await storage.read(key: 'token'); // Await the Future
+      String? tokenStorage = await storage.read(key: 'token');
 
       final headers = {
-        'Authorization':
-            'Bearer $tokenStorage', // Replace with your actual access token
+        'Authorization': 'Bearer $tokenStorage',
         'Content-Type': 'application/json',
       };
 
@@ -249,6 +242,7 @@ class SongService {
       String? tokenStorage = await storage.read(key: 'token');
       final headers = {
         'Authorization': 'Bearer $tokenStorage',
+        'Content-Type': 'application/json', //
       };
 
       final response = await http.delete(
@@ -275,6 +269,7 @@ class SongService {
       String? tokenStorage = await storage.read(key: 'token');
       final headers = {
         'Authorization': 'Bearer $tokenStorage',
+        'Content-Type': 'application/json', //
       };
 
       final response = await http.delete(
@@ -292,6 +287,37 @@ class SongService {
     } catch (e) {
       print('Error removing artist: $e');
       // Handle the error as needed
+    }
+  }
+
+  Future<List<dynamic>> fetchExportData(String artist, String rating) async {
+    try {
+      String? tokenStorage = await storage.read(key: 'token');
+      final headers = {
+        'Authorization': 'Bearer $tokenStorage',
+        'Content-Type': 'application/json',
+      };
+
+      // Construct the URL with query parameters
+      Uri uri = Uri.parse('http://localhost:5001/export')
+          .replace(queryParameters: {'artist': artist, 'rating': rating});
+
+      final response = await http.post(
+        uri,
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        // Parse and return the exported data
+        return json.decode(response.body);
+      } else {
+        print('Failed to export data. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to export data');
+      }
+    } catch (e) {
+      print('Error exporting data: $e');
+      throw Exception('Failed to export data');
     }
   }
 }

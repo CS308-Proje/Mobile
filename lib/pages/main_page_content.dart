@@ -93,10 +93,6 @@ class _MainPageContentState extends State<MainPageContent> {
   }
 }
 
-/*
-  
- */
-
 class _SectionHeader extends StatelessWidget {
   final String title;
   final String route;

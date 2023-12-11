@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'add_song_page.dart';
 import 'remove_song_page.dart';
+import 'export_data_page.dart';
 
 class AddRemovePage extends StatelessWidget {
   const AddRemovePage({super.key});
@@ -8,7 +9,7 @@ class AddRemovePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -34,6 +35,14 @@ class AddRemovePage extends StatelessWidget {
                   size: 25.0,
                 ),
               ),
+              Tab(
+                text: 'Export',
+                icon: Icon(
+                  Icons.import_export,
+                  color: Colors.green,
+                  size: 25.0,
+                ),
+              ),
             ],
           ),
         ),
@@ -41,6 +50,7 @@ class AddRemovePage extends StatelessWidget {
           children: [
             AddSongPage(),
             RemoveSongPage(),
+            ExportDataPage(),
           ],
         ),
       ),

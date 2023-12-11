@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:srs_mobile/pages/recommendations.dart';
+import 'package:srs_mobile/pages/statisticsPage.dart';
 import '../pages/friends_page.dart';
 import '../pages/add_remove_page.dart';
 import '../pages/main_page_content.dart';
@@ -28,11 +29,11 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _widgetOptions.addAll([
-      const RecommendationsPage(), // Index 0
+      const RecommendationsPage(), // Index 0 - Recommendation Page
       const AddRemovePage(), // Index 1 - Add-Remove page
       const MainPageContent(), // Index 2 - Home page content
       const FriendsPage(), // Index 3 - Friends page
-      _placeholderWidget(), // Index 4
+      const StatisticsPage(), // Index 4 - Statistics Page
     ]);
   }
 
