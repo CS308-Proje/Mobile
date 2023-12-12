@@ -44,6 +44,16 @@ Future<List<RecommendationModel>> fetchRecommendations(
       var data = json.decode(response.body);
       if (data['success'] == true && data.containsKey('songs')) {
         List<dynamic> songsJson = data['songs'];
+
+        // Modify here for RecommendationType.friends
+        if (recType == RecommendationType.friends) {
+          return songsJson.map<RecommendationModel>((jsonItem) {
+            var recommendedSongJson = jsonItem['recommendedSong'];
+            return RecommendationModel.fromJson(recommendedSongJson);
+          }).toList();
+        }
+
+        // Original parsing logic for other recommendation types
         return songsJson
             .map<RecommendationModel>(
                 (json) => RecommendationModel.fromJson(json))

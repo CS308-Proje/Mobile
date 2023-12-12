@@ -9,8 +9,10 @@ import '../models/albumModel.dart'; // Import the Album model
 class SongService {
   Future<List<Song>> fetchSongs() async {
     String? tokenStorage = await storage.read(key: 'token');
+
     final headers = {
       'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
     };
 
     final response = await http.get(
@@ -34,6 +36,7 @@ class SongService {
 
     final headers = {
       'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
     };
 
     final response = await http.get(
@@ -57,6 +60,7 @@ class SongService {
 
     final headers = {
       'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
     };
 
     final response = await http.get(
@@ -143,7 +147,6 @@ class SongService {
               List<String>.from(songData['featuringArtistNames']);
           String albumName = songData['albumName'];
 
-          // Add the song (implement this method in your SongService)
           bool isAdded = await addSongInfo(
               songName, mainArtist, featuringArtists, albumName);
 
@@ -157,7 +160,6 @@ class SongService {
           failedCount++;
         }
 
-        // Report progress
         if (onProgress != null) {
           double progress = (i + 1) / songs.length;
           onProgress(progress);
@@ -216,6 +218,7 @@ class SongService {
       String? tokenStorage = await storage.read(key: 'token');
       final headers = {
         'Authorization': 'Bearer $tokenStorage',
+        'Content-Type': 'application/json',
       };
 
       final response = await http.delete(
@@ -228,11 +231,9 @@ class SongService {
       } else {
         print('Failed to remove song. Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        // Handle the error as needed
       }
     } catch (e) {
       print('Error removing song: $e');
-      // Handle the error as needed
     }
   }
 
@@ -255,11 +256,9 @@ class SongService {
       } else {
         print('Failed to remove album. Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        // Handle the error as needed
       }
     } catch (e) {
       print('Error removing album: $e');
-      // Handle the error as needed
     }
   }
 
@@ -282,23 +281,21 @@ class SongService {
       } else {
         print('Failed to remove artist. Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        // Handle the error as needed
       }
     } catch (e) {
       print('Error removing artist: $e');
-      // Handle the error as needed
     }
   }
 
   Future<List<dynamic>> fetchExportData(String artist, String rating) async {
     try {
       String? tokenStorage = await storage.read(key: 'token');
+
       final headers = {
         'Authorization': 'Bearer $tokenStorage',
         'Content-Type': 'application/json',
       };
 
-      // Construct the URL with query parameters
       Uri uri = Uri.parse('http://localhost:5001/export')
           .replace(queryParameters: {'artist': artist, 'rating': rating});
 
@@ -308,7 +305,6 @@ class SongService {
       );
 
       if (response.statusCode == 200) {
-        // Parse and return the exported data
         return json.decode(response.body);
       } else {
         print('Failed to export data. Status code: ${response.statusCode}');

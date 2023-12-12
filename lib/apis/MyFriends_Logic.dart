@@ -35,43 +35,19 @@ class MyFriendsLogic {
     }
   }
 
-  Future<void> addFriendById(String userId, String friendId) async {
-    final url = Uri.parse('http://localhost:5001/friends/add');
+  Future<void> removeFriendById(String friendId) async {
+    String? token = await storage.read(key: 'token');
 
-    final Map<String, String> data = {
-      'userId': userId,
-      'friendId': friendId,
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
     };
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(data),
-    );
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      // Friend added successfully
-      print('Friend added successfully');
-    } else {
-      // Handle errors if necessary
-      print('Error adding friend. Status code: ${response.statusCode}');
-    }
-  }
-
-  Future<void> removeFriendById(String userId, String friendId) async {
-    final url = Uri.parse('http://localhost:5001/friends/remove');
-
-    final Map<String, String> data = {
-      'userId': userId,
-      'friendId': friendId,
-    };
+    final url = Uri.parse('http://localhost:5001/friends/remove/$friendId');
 
     final response = await http.delete(
       url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
+      headers: headers,
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -102,11 +78,21 @@ class MyFriendsLogic {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final List<dynamic> data = json.decode(response.body);
-        List<Invitation> userInvitations = data
-            .map((json) => Invitation.fromJson(json))
-            .where((invitation) => invitation.targetUserId == userId)
-            .toList();
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        final List<Invitation> userInvitations =
+            (data['invitations'] as List<dynamic>).map((json) {
+          final Map<String, dynamic> userJson =
+              json['user_id'] as Map<String, dynamic>;
+          final Friend sender = Friend.fromJson(userJson);
+
+          return Invitation(
+            id: json['_id'] as String,
+            userId: sender.username,
+            targetUserId: json['target_user_id'] as String,
+            status: json['status'] as String,
+          );
+        }).toList();
 
         return userInvitations;
       } else {
@@ -114,7 +100,7 @@ class MyFriendsLogic {
       }
     } catch (e) {
       print('Error: $e');
-      rethrow; // Rethrow the exception
+      throw e;
     }
   }
 
@@ -144,6 +130,7 @@ class MyFriendsLogic {
     if (response.statusCode == 200 || response.statusCode == 201) {
       // Invitation status updated successfully
       print('Invitation status updated successfully');
+      fetchUserInvitations();
     } else {
       // Handle errors if necessary
       print(

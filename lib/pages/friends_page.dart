@@ -59,11 +59,12 @@ class _FriendsPageState extends State<FriendsPage>
   
   Future<void> _acceptFriendRequest(Invitation invitation) async {
     try {
-      await MyFriendsLogic().addFriendById(invitation.targetUserId, invitation.userId);
       await MyFriendsLogic().updateInvitationStatus(invitation.id, 'accepted');
-
       _fetchUserFriends();
-      _fetchUserInvitations();
+      setState(() {
+        // Remove the accepted invitation from the list
+        invitations.removeWhere((inv) => inv.id == invitation.id);
+      });
     } catch (e) {
       print('Error accepting friend request: $e');
     }
@@ -73,7 +74,10 @@ class _FriendsPageState extends State<FriendsPage>
     try {
       await MyFriendsLogic().updateInvitationStatus(invitation.id, 'rejected');
       _fetchUserFriends();
-      _fetchUserInvitations();
+      setState(() {
+        // Remove the rejected invitation from the list
+        invitations.removeWhere((inv) => inv.id == invitation.id);
+      });
     } catch (e) {
       print('Error rejecting friend request: $e');
     }
@@ -82,7 +86,39 @@ class _FriendsPageState extends State<FriendsPage>
   Future<void> _sendFriendRequest() async {
     if (userId != null) {
       final enteredFriendId = addFriendController.text;
-      if (enteredFriendId.isEmpty) {
+
+      // Check if the entered friend ID is the same as the current user's ID
+      if (enteredFriendId == userId) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('You cannot send a friend request to yourself.'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                side: BorderSide(color: Colors.red, width: 2.5),
+              ),
+              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+              contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              backgroundColor: Colors.grey[800],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    addFriendController.clear();
+                    FocusScope.of(context).unfocus();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                ),
+              ],
+            );
+          },
+        );
+      } else if (enteredFriendId.isEmpty) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -113,38 +149,122 @@ class _FriendsPageState extends State<FriendsPage>
           },
         );
       } else {
-        try {
-          await MyFriendsLogic().sendFriendRequest(userId!, enteredFriendId);
-          print('Friend request sent successfully');
-        } catch (e) {
-          print('Error sending friend request: $e');
+        // Check if the entered target is already a friend
+        if (friends.any((friend) => friend.id == enteredFriendId)) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Error'),
+                content: const Text('You are already friends with this person.'),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                  side: BorderSide(color: Colors.red, width: 2.5),
+                ),
+                titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+                contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                backgroundColor: Colors.grey[800],
+                actions: <Widget>[
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
+                    onPressed: () {
+                      addFriendController.clear();
+                      FocusScope.of(context).unfocus();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // Check if the user already sent an invitation to the target user
+          if (invitations.any((invitation) => invitation.targetUserId == enteredFriendId)) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Error'),
+                  content: const Text('You have already sent a friend request to this person.'),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    side: BorderSide(color: Colors.red, width: 2.5),
+                  ),
+                  titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+                  contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                  backgroundColor: Colors.grey[800],
+                  actions: <Widget>[
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
+                      onPressed: () {
+                        addFriendController.clear();
+                        FocusScope.of(context).unfocus();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK', style: TextStyle(fontSize: 20.0)),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            try {
+              await MyFriendsLogic().sendFriendRequest(userId!, enteredFriendId);
+              print('Friend request sent successfully');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Friend request sent successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } catch (e) {
+              print('Error sending friend request: $e');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Error sending friend request!'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+          addFriendController.clear();
+          FocusScope.of(context).unfocus();
         }
-        addFriendController.clear();
-        FocusScope.of(context).unfocus();
       }
     }
   }
 
   void _removeFriend(String friendId) async {
     if (userId != null) {
-      await MyFriendsLogic().removeFriendById(userId!, friendId);
+      await MyFriendsLogic().removeFriendById(friendId);
       _fetchUserFriends();
       setState(() {
-        filteredFriends =
-            filteredFriends.where((friend) => friend.id != friendId).toList();
+        filteredFriends = filteredFriends.where((friend) => friend.id != friendId).toList();
+        friends = friends.where((friend) => friend.id != friendId).toList();
       });
       searchController.clear();
       searchFocusNode.unfocus();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Friend removed successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
   void _filterItems(String keyword) {
     setState(() {
       filteredFriends = friends
-          .where((friend) =>
-              friend.name.toLowerCase().contains(keyword.toLowerCase()) ||
-              friend.username.toLowerCase().contains(keyword.toLowerCase()))
-          .toList();
+        .where((friend) =>
+            friend.name.toLowerCase().contains(keyword.toLowerCase()) ||
+            friend.username.toLowerCase().contains(keyword.toLowerCase()))
+        .toList();
     });
   }
 
@@ -225,16 +345,16 @@ class _FriendsPageState extends State<FriendsPage>
                       // Content for "Add" tab
                       Column(
                         children: [
-                          const SizedBox(height: 5.0),
+                          const SizedBox(height: 200.0),
                           Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(30.0),
                             child: TextField(
                               controller: addFriendController,
-                              style: const TextStyle(color: Colors.green),
+                              style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Colors.grey[800],
-                                hintText: 'Enter friend\'s ID...',
+                                hintText: 'Enter an ID here to send a friend request...',
                                 hintStyle: const TextStyle(color: Colors.white),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30.0),
@@ -292,29 +412,6 @@ class _FriendsPageState extends State<FriendsPage>
                               ),
                             ), 
                           ),
-                          const SizedBox(height: 20.0),
-                          friends.isEmpty
-                            ? const Center(
-                                //const SizedBox(height:20.0);
-                                child: Column(children: [
-                                  SizedBox(height: 150.0,),
-                                  Text('No friends yet.', style: TextStyle(color: Colors.white, fontSize: 22.0),)
-                                ],
-                              ),
-                            )
-                            : Expanded(
-                                child: ListView.separated(
-                                  itemCount: friends.length,
-                                  separatorBuilder: (context, index) => const Divider(color: Colors.green),
-                                  itemBuilder: (context, index) {
-                                    final friend = friends[index];
-                                    return ListTile(
-                                      title: Text(friend.name, style: const TextStyle(color: Colors.green)),
-                                      subtitle: Text(friend.username, style: const TextStyle(color: Colors.white)),
-                                    );
-                                  },
-                                ),
-                              ),
                         ],
                       ),
                       // Content for "Invitations" tab
@@ -324,65 +421,65 @@ class _FriendsPageState extends State<FriendsPage>
                           Expanded(
                             child: invitations.isNotEmpty
                                 ? ListView.builder(
-                                    itemCount: invitations.length,
-                                    itemBuilder: (context, index) {
-                                      final invitation = invitations[index];
-                                      return Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          vertical: 5.0,
-                                          horizontal: 20.0,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[800],
-                                          borderRadius: BorderRadius.circular(15.0),
-                                        ),
-                                        child: ListTile(
-                                          title: Text(
-                                            'Friend request from ${invitation.userId}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16.0,
-                                            ),
-                                          ),
-                                          subtitle: Text(
-                                            'Status: ${invitation.status}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14.0,
-                                            ),
-                                          ),
-                                          trailing: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () => _acceptFriendRequest(invitation),
-                                                icon: const Icon(
-                                                  Icons.check,
-                                                  color: Colors.green,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () => _rejectFriendRequest(invitation),
-                                                icon: const Icon(
-                                                  Icons.clear,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  )
-                                : const Center(
-                                    child: Text(
-                                      'No friend invitations.',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20.0,
+                                  itemCount: invitations.length,
+                                  itemBuilder: (context, index) {
+                                    final invitation = invitations[index];
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 5.0,
+                                        horizontal: 20.0,
                                       ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[800],
+                                        borderRadius: BorderRadius.circular(15.0),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(
+                                          'Friend request from ${invitation.userId}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.0,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          'Status: ${invitation.status}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () => _acceptFriendRequest(invitation),
+                                              icon: const Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              onPressed: () => _rejectFriendRequest(invitation),
+                                              icon: const Icon(
+                                                Icons.clear,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Center(
+                                  child: Text(
+                                    'No friend invitations.',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20.0,
                                     ),
                                   ),
+                                ),
                           ),
                         ],
                       ),
