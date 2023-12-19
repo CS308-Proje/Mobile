@@ -43,6 +43,58 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  
+  void _showVisibilitySettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          title: const Text('Should Friends See Music Recommendations?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                _VisibilitySetting(user: 'user1'),
+                _VisibilitySetting(user: 'user2'),
+                _VisibilitySetting(user: 'user3'),
+                _VisibilitySetting(user: 'user4'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              style: TextButton.styleFrom(primary: Colors.green),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showNotifications(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: Theme.of(context).appBarTheme.backgroundColor, 
+          child: ListView.builder(
+            itemCount: 5,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: Text('Notification ${index + 1}'),
+                onTap: () {}, 
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,6 +154,32 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
+    );
+  }
+}
+class _VisibilitySetting extends StatefulWidget {
+  final String user;
+
+  const _VisibilitySetting({Key? key, required this.user}) : super(key: key);
+
+  @override
+  _VisibilitySettingState createState() => _VisibilitySettingState();
+}
+
+class _VisibilitySettingState extends State<_VisibilitySetting> {
+  bool _isVisible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      title: Text(widget.user),
+      value: _isVisible,
+      onChanged: (bool value) {
+        setState(() {
+          _isVisible = value;
+        });
+      },
+      activeColor: Colors.green,
     );
   }
 }
