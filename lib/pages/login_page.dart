@@ -15,6 +15,123 @@ class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
 
+  void _showForgotPasswordDialog() {
+    TextEditingController emailController = TextEditingController();
+    TextEditingController verificationController = TextEditingController();
+    String emailError = '';
+    String verificationError = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF171717),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              title:
+                  Text("Reset Password", style: TextStyle(color: Colors.white)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      hintText: "Enter your email",
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  if (emailError.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(emailError,
+                          style: TextStyle(color: Colors.red, fontSize: 12)),
+                    ),
+                  ],
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: verificationController,
+                    decoration: InputDecoration(
+                      hintText: "Enter verification code",
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  if (verificationError.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(verificationError,
+                          style: TextStyle(color: Colors.red, fontSize: 12)),
+                    ),
+                  ],
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("Send", style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    // Reset error messages
+                    setState(() {
+                      emailError = '';
+                      verificationError = '';
+                    });
+
+                    // Validate email field
+                    if (emailController.text.isEmpty) {
+                      setState(() {
+                        emailError = "Please enter your email";
+                      });
+                      return; // Stop further execution on error
+                    }
+
+                    // Validate verification field
+                    if (verificationController.text.isEmpty) {
+                      setState(() {
+                        verificationError =
+                            "Please enter the verification code";
+                      });
+                      return; // Stop further execution on error
+                    }
+
+                    // Validate if both fields have identical content
+                    if (emailController.text != verificationController.text) {
+                      setState(() {
+                        verificationError =
+                            "The verification code does not match the email";
+                      });
+                      return; // Stop further execution on error
+                    }
+
+                    // If all validations pass, proceed with sending the data
+                    print("Send reset link to ${emailController.text}");
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,9 +211,12 @@ class _LoginPageState extends State<LoginPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[300]),
+                    GestureDetector(
+                      onTap: _showForgotPasswordDialog,
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(color: Colors.grey[300]),
+                      ),
                     ),
                   ],
                 ),

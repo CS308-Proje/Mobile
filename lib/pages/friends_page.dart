@@ -23,10 +23,11 @@ class _FriendsPageState extends State<FriendsPage>
 
   @override
   void initState() {
-    super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _fetchUserId();
+    _fetchUserFriends();
     _fetchUserInvitations();
+    super.initState();
   }
 
   Future<void> _fetchUserId() async {
@@ -60,11 +61,17 @@ class _FriendsPageState extends State<FriendsPage>
   Future<void> _acceptFriendRequest(Invitation invitation) async {
     try {
       await MyFriendsLogic().updateInvitationStatus(invitation.id, 'accepted');
-      _fetchUserFriends();
-      setState(() {
-        // Remove the accepted invitation from the list
-        invitations.removeWhere((inv) => inv.id == invitation.id);
-      });
+
+      // Fetch updated data before navigating to FriendsPage
+      await _fetchUserFriends();
+      await _fetchUserInvitations();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Friend request accepted successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       print('Error accepting friend request: $e');
     }
@@ -73,11 +80,17 @@ class _FriendsPageState extends State<FriendsPage>
   Future<void> _rejectFriendRequest(Invitation invitation) async {
     try {
       await MyFriendsLogic().updateInvitationStatus(invitation.id, 'rejected');
-      _fetchUserFriends();
-      setState(() {
-        // Remove the rejected invitation from the list
-        invitations.removeWhere((inv) => inv.id == invitation.id);
-      });
+
+      // Fetch updated data before navigating to FriendsPage
+      await _fetchUserFriends();
+      await _fetchUserInvitations();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Friend request rejected successfully!'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } catch (e) {
       print('Error rejecting friend request: $e');
     }

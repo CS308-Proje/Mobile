@@ -100,7 +100,7 @@ class MyFriendsLogic {
       }
     } catch (e) {
       print('Error: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -167,6 +167,102 @@ class MyFriendsLogic {
       // Handle errors if necessary
       print(
           'Error sending friend request. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<void> allowFriendRecommendations(String friendId) async {
+    try {
+      String? token = await storage.read(key: 'token');
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final url =
+          Uri.parse('http://localhost:5001/friends/allowfriend/$friendId');
+
+      final response = await http.post(
+        url,
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        print('Friend recommendations allowed successfully');
+      } else {
+        print(
+            'Error allowing friend recommendations. Status code: ${response.statusCode}');
+        throw Exception('Failed to allow friend recommendations');
+      }
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> disallowFriendRecommendations(String friendId) async {
+    try {
+      String? token = await storage.read(key: 'token');
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final url =
+          Uri.parse('http://localhost:5001/friends/disallowfriend/$friendId');
+
+      final response = await http.post(
+        url,
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        print('Friend recommendations disallowed successfully');
+      } else {
+        print(
+            'Error disallowing friend recommendations. Status code: ${response.statusCode}');
+        throw Exception('Failed to disallow friend recommendations');
+      }
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Friend>> fetchUserFriendsWithVisibility() async {
+    try {
+      String? userId = await fetchUserId();
+      String? token = await storage.read(key: 'token');
+
+      if (userId == null || token == null) {
+        throw Exception('User ID or token is null');
+      }
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.get(
+        Uri.parse('http://localhost:5001/friends/all'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        var data = json.decode(response.body) as Map<String, dynamic>;
+        var friends = data['friends'] as List;
+
+        return friends.map<Friend>((json) {
+          Friend user = Friend.fromJson(json);
+          return user;
+        }).toList();
+      } else {
+        throw Exception('Failed to load friends with visibility');
+      }
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
     }
   }
 }

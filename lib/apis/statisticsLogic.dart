@@ -13,7 +13,7 @@ class StatisticsLogic {
     };
 
     final response = await http.get(
-      Uri.parse('http://localhost:5001/song-analysis?type=${type}'),
+      Uri.parse('http://localhost:5001/song-analysis?type=$type'),
       headers: headers, // Include headers if your endpoint requires them
     );
 

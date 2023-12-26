@@ -53,7 +53,7 @@ class _MainPageContentState extends State<MainPageContent> {
       key: _refreshIndicatorKey,
       onRefresh: _refreshData,
       child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -77,13 +77,13 @@ class _MainPageContentState extends State<MainPageContent> {
               ),
               const SizedBox(height: 20.0),
 
-              _SectionHeader(title: 'Songs', route: '/songs'),
+              const _SectionHeader(title: 'Songs', route: '/songs'),
               _MusicList(dataType: DataType.songs, dataFuture: songsFuture),
 
-              _SectionHeader(title: 'Albums', route: '/albums'),
+              const _SectionHeader(title: 'Albums', route: '/albums'),
               _MusicList(dataType: DataType.albums, dataFuture: albumsFuture),
 
-              _SectionHeader(title: 'Artists', route: '/artists'),
+              const _SectionHeader(title: 'Artists', route: '/artists'),
               _MusicList(dataType: DataType.artists, dataFuture: artistsFuture),
             ],
           ),
@@ -92,6 +92,10 @@ class _MainPageContentState extends State<MainPageContent> {
     );
   }
 }
+
+/*
+  
+ */
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -131,8 +135,7 @@ class _MusicList extends StatelessWidget {
   final DataType dataType;
   final Future<List<dynamic>> dataFuture;
 
-  const _MusicList({Key? key, required this.dataType, required this.dataFuture})
-      : super(key: key);
+  const _MusicList({required this.dataType, required this.dataFuture});
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +167,7 @@ class _MusicList extends StatelessWidget {
 class _MusicCard extends StatefulWidget {
   final dynamic item;
 
-  const _MusicCard({Key? key, required this.item}) : super(key: key);
+  const _MusicCard({required this.item});
 
   @override
   __MusicCardState createState() => __MusicCardState();

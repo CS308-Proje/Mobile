@@ -4,7 +4,7 @@ import '../models/recommendationModel.dart';
 import '../apis/MySongs_Logic.dart';
 
 class RecommendationsPage extends StatefulWidget {
-  const RecommendationsPage({Key? key}) : super(key: key);
+  const RecommendationsPage({super.key});
 
   @override
   _RecommendationsPageState createState() => _RecommendationsPageState();
@@ -176,16 +176,11 @@ class _RecommendationsPageState extends State<RecommendationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Recommendations'),
-        backgroundColor: const Color(0xFF171717),
-      ),
       backgroundColor: const Color(0xFF171717),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(

@@ -8,7 +8,7 @@ import 'package:srs_mobile/apis/MySongs_Logic.dart';
 enum ExportType { CSV, JSON, TXT }
 
 class ExportDataPage extends StatefulWidget {
-  const ExportDataPage({Key? key}) : super(key: key);
+  const ExportDataPage({super.key});
 
   @override
   _ExportDataPageState createState() => _ExportDataPageState();
@@ -55,16 +55,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
       }
 
       List<dynamic> exportData = await SongService().fetchExportData(artist, rating);
-
-      if (_selectedExportType == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select an export type.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
 
       String fileName;
 

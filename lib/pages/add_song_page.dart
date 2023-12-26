@@ -56,8 +56,7 @@ class AddSongInfoForm extends StatefulWidget {
 class _AddSongInfoFormState extends State<AddSongInfoForm> {
   final TextEditingController _songNameController = TextEditingController();
   final TextEditingController _mainArtistController = TextEditingController();
-  final TextEditingController _featuringArtistsController =
-      TextEditingController();
+  final TextEditingController _featuringArtistsController = TextEditingController();
   final TextEditingController _albumNameController = TextEditingController();
 
   @override
@@ -69,43 +68,27 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
           TextField(
             controller: _songNameController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Song Name',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Song Name', labelStyle: TextStyle(color: Colors.green)),
           ),
-          const SizedBox(
-            height: 10.0,
-          ),
+          const SizedBox(height: 10.0,),
           TextField(
             controller: _mainArtistController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Main Artist',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Main Artist', labelStyle: TextStyle(color: Colors.green)),
           ),
-          const SizedBox(
-            height: 10.0,
-          ),
+          const SizedBox(height: 10.0,),
           TextField(
             controller: _featuringArtistsController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Featuring Artists',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Featuring Artists', labelStyle: TextStyle(color: Colors.green)),
           ),
-          const SizedBox(
-            height: 10.0,
-          ),
+          const SizedBox(height: 10.0,),
           TextField(
             controller: _albumNameController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Album Name',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Album Name', labelStyle: TextStyle(color: Colors.green)),
           ),
-          const SizedBox(
-            height: 25.0,
-          ),
+          const SizedBox(height: 25.0,),
           SizedBox(
             width: 180.0,
             height: 45.0,
@@ -113,36 +96,29 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
               onPressed: () async {
                 String songName = _songNameController.text.trim();
                 String mainArtist = _mainArtistController.text.trim();
-                String featuringArtists =
-                    _featuringArtistsController.text.trim();
+                String featuringArtists = _featuringArtistsController.text.trim();
                 String albumName = _albumNameController.text.trim();
 
-                if (songName.isEmpty ||
-                    mainArtist.isEmpty ||
-                    albumName.isEmpty) {
-                  // Show dialog if any field except featuring artist names is empty
+                if (songName.isEmpty || mainArtist.isEmpty || albumName.isEmpty) {
                   showDialog(
                     context: context,
                     builder: (context) {
                       return AlertDialog(
                         backgroundColor: Colors.grey[800],
                         title: const Text('Error'),
-                        titleTextStyle:
-                            const TextStyle(fontSize: 25, color: Colors.red),
+                        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
                         content: const Text('A necessary field is empty.'),
-                        contentTextStyle:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          side: BorderSide(color: Colors.red, width: 2.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text('OK',
-                                style: TextStyle(
-                                    fontSize: 20.0, color: Colors.red)),
+                            child: const Text('OK', style: TextStyle(fontSize: 20.0, color: Colors.red)),
                           ),
                         ],
                       );
@@ -151,8 +127,7 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                   return;
                 }
 
-                List<String> featuringArtistsList =
-                    featuringArtists.split(',').map((e) => e.trim()).toList();
+                List<String> featuringArtistsList = featuringArtists.split(',').map((e) => e.trim()).toList();
 
                 bool isAdded = await SongService().addSongInfo(
                   songName,
@@ -171,11 +146,10 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                         content: const Text('Song added successfully!'),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          side: BorderSide(color: Colors.green, width: 2.5),
                         ),
-                        titleTextStyle:
-                            const TextStyle(fontSize: 25, color: Colors.green),
-                        contentTextStyle:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.green),
+                        contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                         backgroundColor: Colors.grey[800],
                         actions: <Widget>[
                           TextButton(
@@ -185,8 +159,7 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text('OK',
-                                style: TextStyle(fontSize: 20.0)),
+                            child: const Text('OK', style: TextStyle(fontSize: 20.0)),
                           ),
                         ],
                       );
@@ -206,11 +179,10 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                         content: const Text('Failed to add song.'),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          side: BorderSide(color: Colors.red, width: 2.5),
                         ),
-                        titleTextStyle:
-                            const TextStyle(fontSize: 25, color: Colors.red),
-                        contentTextStyle:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+                        contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                         backgroundColor: Colors.grey[800],
                         actions: <Widget>[
                           TextButton(
@@ -220,8 +192,7 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: const Text('OK',
-                                style: TextStyle(fontSize: 20.0)),
+                            child: const Text('OK', style: TextStyle(fontSize: 20.0)),
                           ),
                         ],
                       );
@@ -236,7 +207,7 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                   borderRadius: BorderRadius.circular(30.0),
                   side: const BorderSide(
                     color: Colors.green,
-                    width: 1.0,
+                    width: 3.0,
                   ),
                 ),
               ),
@@ -247,8 +218,7 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
                   children: [
                     Icon(Icons.add, color: Colors.green),
                     SizedBox(width: 10.0),
-                    Text('Add Song',
-                        style: TextStyle(color: Colors.white, fontSize: 18.0)),
+                    Text('Add Song', style: TextStyle(color: Colors.white, fontSize: 18.0)),
                   ],
                 ),
               ),
@@ -259,6 +229,7 @@ class _AddSongInfoFormState extends State<AddSongInfoForm> {
     );
   }
 }
+
 
 class AddSongFileForm extends StatefulWidget {
   const AddSongFileForm({super.key});
@@ -305,7 +276,7 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
                 borderRadius: BorderRadius.circular(30.0),
                 side: const BorderSide(
                   color: Colors.green,
-                  width: 1.0,
+                  width: 3.0,
                 ),
               ),
             ),
@@ -314,8 +285,7 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Select a file',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0)),
+                  Text('Select a file', style: TextStyle(color: Colors.white, fontSize: 18.0)),
                 ],
               ),
             ),
@@ -339,23 +309,19 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
                     return AlertDialog(
                       backgroundColor: Colors.grey[800],
                       title: const Text('Error'),
-                      titleTextStyle:
-                          const TextStyle(fontSize: 25, color: Colors.red),
-                      content:
-                          const Text('Please select a file before uploading.'),
-                      contentTextStyle:
-                          const TextStyle(fontSize: 20, color: Colors.white),
+                      titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
+                      content: const Text('Please select a file before uploading.'),
+                      contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                        side: BorderSide(color: Colors.red, width: 2.5),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text('OK',
-                              style:
-                                  TextStyle(fontSize: 20.0, color: Colors.red)),
+                          child: const Text('OK', style: TextStyle(fontSize: 20.0, color: Colors.red)),
                         ),
                       ],
                     );
@@ -374,7 +340,7 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
                 borderRadius: BorderRadius.circular(30.0),
                 side: const BorderSide(
                   color: Colors.green,
-                  width: 1.0,
+                  width: 3.0,
                 ),
               ),
             ),
@@ -385,8 +351,7 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
                 children: [
                   Icon(Icons.upload_file, color: Colors.green),
                   SizedBox(width: 10.0),
-                  Text('Upload File',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0)),
+                  Text('Upload File', style: TextStyle(color: Colors.white, fontSize: 18.0)),
                 ],
               ),
             ),
@@ -417,8 +382,7 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
       }
 
       // Call the method to handle adding songs from file with progress
-      List<int> result =
-          await songService.addSongFileWithProgress(file, onProgress);
+      List<int> result = await songService.addSongFileWithProgress(file, onProgress);
 
       int addedCount = result[0];
       int failedCount = result[1];
@@ -430,23 +394,19 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
           return AlertDialog(
             backgroundColor: Colors.grey[800],
             title: const Text('Upload Result'),
-            content: Text(
-                '$addedCount songs added successfully.\n\n$failedCount songs failed to add.'),
-            shape: const RoundedRectangleBorder(
+            content: Text('$addedCount songs added successfully.\n\n$failedCount songs failed to add.'),
+              shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(30.0)),
+              side: BorderSide(color: Colors.green, width: 2.5),
             ),
             titleTextStyle: const TextStyle(fontSize: 25, color: Colors.green),
-            contentTextStyle:
-                const TextStyle(fontSize: 20, color: Colors.white),
+            contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text(
-                  'OK',
-                  style: TextStyle(fontSize: 20.0, color: Colors.green),
-                ),
+                child: const Text('OK', style: TextStyle(fontSize: 20.0, color: Colors.green),),
               ),
             ],
           );
@@ -464,8 +424,9 @@ class _AddSongFileFormState extends State<AddSongFileForm> {
   }
 }
 
+
 class TransferSongsForm extends StatefulWidget {
-  const TransferSongsForm({Key? key}) : super(key: key);
+  const TransferSongsForm({super.key});
 
   @override
   _TransferSongsFormState createState() => _TransferSongsFormState();
@@ -474,8 +435,7 @@ class TransferSongsForm extends StatefulWidget {
 class _TransferSongsFormState extends State<TransferSongsForm> {
   final TextEditingController _databaseURIController = TextEditingController();
   final TextEditingController _databaseNameController = TextEditingController();
-  final TextEditingController _collectionNameController =
-      TextEditingController();
+  final TextEditingController _collectionNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -486,35 +446,25 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
           TextField(
             controller: _databaseURIController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Database URI',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Database URI', labelStyle: TextStyle(color: Colors.green)),
           ),
-          const SizedBox(
-            height: 10.0,
-          ),
+          const SizedBox(height: 10.0,),
           TextField(
             controller: _databaseNameController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Database Name',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Database Name', labelStyle: TextStyle(color: Colors.green)),
           ),
-          const SizedBox(
-            height: 10.0,
-          ),
+          const SizedBox(height: 10.0,),
           TextField(
             controller: _collectionNameController,
             style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                labelText: 'Collection Name',
-                labelStyle: TextStyle(color: Colors.green)),
+            decoration: const InputDecoration(labelText: 'Collection Name', labelStyle: TextStyle(color: Colors.green)),
           ),
           const SizedBox(height: 20.0),
           SizedBox(
             width: 220.0,
             height: 50.0,
-            child: ElevatedButton(
+            child: ElevatedButton (
               onPressed: () async {
                 // Retrieve values from controllers
                 String databaseURI = _databaseURIController.text.trim();
@@ -522,9 +472,7 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                 String collectionName = _collectionNameController.text.trim();
 
                 // Check if any field is empty
-                if (databaseURI.isEmpty ||
-                    databaseName.isEmpty ||
-                    collectionName.isEmpty) {
+                if (databaseURI.isEmpty || databaseName.isEmpty || collectionName.isEmpty) {
                   // Show dialog for empty fields
                   showDialog(
                     context: context,
@@ -532,22 +480,19 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                       return AlertDialog(
                         backgroundColor: Colors.grey[800],
                         title: const Text('Error'),
-                        titleTextStyle:
-                            const TextStyle(fontSize: 25, color: Colors.red),
+                        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
                         content: const Text('All fields are required.'),
-                        contentTextStyle:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          side: BorderSide(color: Colors.red, width: 2.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text('OK',
-                                style: TextStyle(
-                                    fontSize: 20.0, color: Colors.red)),
+                            child: const Text('OK', style: TextStyle(fontSize: 20.0, color: Colors.red)),
                           ),
                         ],
                       );
@@ -557,8 +502,7 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                 }
 
                 // Call the method to handle transferring songs
-                bool transferResult = await SongService()
-                    .transferSongs(databaseURI, databaseName, collectionName);
+                bool transferResult = await SongService().transferSongs(databaseURI, databaseName, collectionName);
 
                 // Display result dialog based on transferResult
                 if (transferResult) {
@@ -569,22 +513,19 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                       return AlertDialog(
                         backgroundColor: Colors.grey[800],
                         title: const Text('Success'),
-                        titleTextStyle:
-                            const TextStyle(fontSize: 25, color: Colors.green),
+                        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.green),
                         content: const Text('Songs transferred successfully.'),
-                        contentTextStyle:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          side: BorderSide(color: Colors.green, width: 2.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text('OK',
-                                style: TextStyle(
-                                    fontSize: 20.0, color: Colors.green)),
+                            child: const Text('OK', style: TextStyle(fontSize: 20.0, color: Colors.green)),
                           ),
                         ],
                       );
@@ -598,22 +539,19 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                       return AlertDialog(
                         backgroundColor: Colors.grey[800],
                         title: const Text('Error'),
-                        titleTextStyle:
-                            const TextStyle(fontSize: 25, color: Colors.red),
+                        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.red),
                         content: const Text('Failed to transfer songs.'),
-                        contentTextStyle:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        contentTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          side: BorderSide(color: Colors.red, width: 2.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text('OK',
-                                style: TextStyle(
-                                    fontSize: 20.0, color: Colors.red)),
+                            child: const Text('OK', style: TextStyle(fontSize: 20.0, color: Colors.red)),
                           ),
                         ],
                       );
@@ -628,7 +566,7 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                   borderRadius: BorderRadius.circular(30.0),
                   side: const BorderSide(
                     color: Colors.green,
-                    width: 1.0,
+                    width: 3.0,
                   ),
                 ),
               ),
@@ -639,8 +577,7 @@ class _TransferSongsFormState extends State<TransferSongsForm> {
                   children: [
                     Icon(Icons.send, color: Colors.green),
                     SizedBox(width: 10.0),
-                    Text('Transfer Songs',
-                        style: TextStyle(color: Colors.white, fontSize: 18.0)),
+                    Text('Transfer Songs', style: TextStyle(color: Colors.white, fontSize: 18.0)),
                   ],
                 ),
               ),

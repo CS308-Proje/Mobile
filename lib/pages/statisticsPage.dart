@@ -6,7 +6,7 @@ import '../models/artistModel.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class StatisticsPage extends StatefulWidget {
-  const StatisticsPage({Key? key}) : super(key: key);
+  const StatisticsPage({super.key});
 
   @override
   _StatisticsPageState createState() => _StatisticsPageState();
@@ -60,13 +60,12 @@ class _StatisticsPageState extends State<StatisticsPage>
     return Container(
       color: Colors.white70,
       child: Padding(
-        padding: EdgeInsets.only(
-            bottom: 100.0), // Add 15 pixels of padding at the bottom
+        padding: const EdgeInsets.only(
+            bottom: 100.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildArtistFutureBuilder(),
-            // Add any additional widgets below if needed
           ],
         ),
       ),
@@ -243,13 +242,16 @@ class _StatisticsPageState extends State<StatisticsPage>
           const Color(0xFF171717), // Set the background color to black
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Statistics'),
+        //title: const Text('Statistics'),
         backgroundColor: const Color(0xFF171717),
-        bottom: TabBar(
+        title: TabBar(
+          labelStyle: const TextStyle(color: Colors.white),
+          indicatorColor: Colors.green,
+          //indicatorPadding: EdgeInsets.symmetric(vertical: 5.0),
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Favorites'),
-            Tab(text: 'Charts'),
+            Tab(text: 'Favorites',), //icon: Icon(Icons.star, color: Colors.green, size: 25.0,),
+            Tab(text: 'Charts',), //icon: Icon(Icons.bar_chart, color: Colors.green, size: 25.0,),
           ],
         ),
       ),
