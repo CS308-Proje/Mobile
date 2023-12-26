@@ -138,3 +138,44 @@ Future<void> fetchAndStoreUserData() async {
     throw Exception('Failed to fetch user data');
   }
 }
+
+Future<void> forgotPasswordRequest(BuildContext context, String email) async {
+  var url = Uri.parse('http://localhost:5001/auth/forgotpassword');
+  var data = {'email': email};
+
+  try {
+    var response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(data),
+    );
+
+    if (response.statusCode == 200) {
+      var responseBody = json.decode(response.body);
+      if (responseBody['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseBody['data'])),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to send email: ${responseBody['data']}')),
+        );
+      }
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to reset password.')),
+      );
+    }
+  } catch (error) {
+    print('Error making the request: $error');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content:
+              Text('Error connecting to the server. Please try again later.')),
+    );
+  }
+}

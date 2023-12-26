@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextField(
                     controller: emailController,
                     decoration: InputDecoration(
-                      hintText: "Enter your email",
+                      hintText: "Enter your mail",
                       hintStyle: TextStyle(color: Colors.grey[500]),
                       filled: true,
                       fillColor: Colors.white,
@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextField(
                     controller: verificationController,
                     decoration: InputDecoration(
-                      hintText: "Enter verification code",
+                      hintText: "verify your mail",
                       hintStyle: TextStyle(color: Colors.grey[500]),
                       filled: true,
                       fillColor: Colors.white,
@@ -119,9 +119,13 @@ class _LoginPageState extends State<LoginPage> {
                       return; // Stop further execution on error
                     }
 
-                    // If all validations pass, proceed with sending the data
-                    print("Send reset link to ${emailController.text}");
-                    Navigator.of(context).pop();
+                    forgotPasswordRequest(context, emailController.text)
+                        .then((_) {
+                      // If you want to close the dialog after the request
+                      Navigator.of(context).pop();
+                    }).catchError((error) {
+                      // Handle any errors here if necessary
+                    });
                   },
                 ),
               ],
