@@ -1,14 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'recommendations.dart';
+import '../pages/recommendations.dart';
 import '../pages/friends_page.dart';
 import '../pages/add_remove_page.dart';
 import '../pages/statisticsPage.dart';
 import '../pages/main_page_content.dart';
 import '../apis/MyFriends_Logic.dart';
-import '../models/invitationModel.dart';
+import '../apis/recommendationsLogic.dart';
 import '../models/friendModel.dart';
+import '../models/invitationModel.dart';
+import '../models/recommendationModel.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -80,6 +82,7 @@ class _MainPageState extends State<MainPage> {
 
   void _showNotifications(BuildContext context) async {
     List<Invitation> invitations = await MyFriendsLogic().fetchUserInvitations();
+    List<RecommendationModel> recommendations = await fetchRecommendations(RecommendationType.spotify);
 
     showModalBottomSheet(
       context: context,
@@ -87,46 +90,109 @@ class _MainPageState extends State<MainPage> {
         return Container(
           color: Colors.grey[800],
           child: ListView.separated(
-            itemCount: invitations.length,
+            itemCount: invitations.length + recommendations.length,
             separatorBuilder: (BuildContext context, int index) => const Divider(
               color: Colors.white,
               thickness: 1.0,
             ),
             itemBuilder: (BuildContext context, int index) {
-              Invitation invitation = invitations[index];
-
-              return ListTile(
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Friend Request from ${invitation.userId}',
-                        style: const TextStyle(color: Colors.white, fontSize: 18.0),
+              if (index < invitations.length) {
+                // Display friend invitation
+                Invitation invitation = invitations[index];
+                return Dismissible(
+                  key: Key(invitation.id), // Unique key for each item
+                  background: Container(
+                    color: Colors.red,
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    alignment: Alignment.centerLeft,
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (direction) async {
+                    // Delete the friend invitation
+                    await MyFriendsLogic().updateInvitationStatus(invitation.id, 'deleted');
+                    Navigator.pop(context); // Close the bottom sheet
+                  },
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Friend Request from ${invitation.userId}',
+                            style: const TextStyle(color: Colors.white, fontSize: 18.0),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green),
+                          onPressed: () async {
+                            // Accept friend request
+                            await MyFriendsLogic().updateInvitationStatus(invitation.id, 'accepted');
+                            Navigator.pop(context); // Close the bottom sheet
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          onPressed: () async {
+                            // Reject friend request
+                            await MyFriendsLogic().updateInvitationStatus(invitation.id, 'rejected');
+                            Navigator.pop(context); // Close the bottom sheet
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } else {
+                // Display song recommendation
+                RecommendationModel recommendation = recommendations[index - invitations.length];
+                return Dismissible(
+                  key: Key(recommendation.songName), // Unique key for each item
+                  background: Container(
+                    color: Colors.red,
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    alignment: Alignment.centerLeft,
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (direction) async {
+                    // Delete the song recommendation
+                    Navigator.pop(context); // Close the bottom sheet
+                  },
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                    leading: Image.network(
+                      recommendation.albumImg,
+                      width: 50.0,
+                      height: 50.0,
+                      fit: BoxFit.cover,
+                    ),
+                    title: RichText(
+                      text: TextSpan(
+                        style: DefaultTextStyle.of(context).style,
+                        children: [
+                          TextSpan(
+                            text: recommendation.songName,
+                            style: TextStyle(color: Colors.green, fontSize: 18.0),
+                          ),
+                          const TextSpan(text: '\n', style: TextStyle(color: Colors.white, fontSize: 18.0)),
+                          TextSpan(text: recommendation.mainArtistName, style: const TextStyle(color: Colors.white, fontSize: 18.0)),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.check, color: Colors.green),
-                      onPressed: () async {
-                        // Accept friend request
-                        await MyFriendsLogic().updateInvitationStatus(invitation.id, 'accepted');
-                        Navigator.pop(context); // Close the bottom sheet
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red),
-                      onPressed: () async {
-                        // Reject friend request
-                        await MyFriendsLogic().updateInvitationStatus(invitation.id, 'rejected');
-                        Navigator.pop(context); // Close the bottom sheet
-                      },
-                    ),
-                  ],
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () async {
+                      setState(() {
+                        recommendations.removeAt(index - invitations.length);
+                    });
+                    Navigator.pop(context);
+                  },
                 ),
                 onTap: () {
-                  // Handle tapping on the notification if needed
+                  // Handle tapping on the song recommendation if needed
                   // You can navigate to a specific page or take any action
                 },
-              );
+                  ),
+                );
+              }
             },
           ),
         );
