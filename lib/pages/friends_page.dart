@@ -10,8 +10,7 @@ class FriendsPage extends StatefulWidget {
   _FriendsPageState createState() => _FriendsPageState();
 }
 
-class _FriendsPageState extends State<FriendsPage>
-    with SingleTickerProviderStateMixin {
+class _FriendsPageState extends State<FriendsPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? userId;
   List<Friend> friends = [];
@@ -24,10 +23,26 @@ class _FriendsPageState extends State<FriendsPage>
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     _fetchUserId();
     _fetchUserFriends();
     _fetchUserInvitations();
     super.initState();
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      switch (_tabController.index) {
+        case 0: // Add tab
+          break;
+        case 1: // Invitations tab
+          _fetchUserInvitations();
+          break;
+        case 2: // Remove tab
+          _fetchUserFriends();
+          break;
+      }
+    }
   }
 
   Future<void> _fetchUserId() async {
