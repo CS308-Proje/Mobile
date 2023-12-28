@@ -677,6 +677,7 @@ class _AddSongSpotifyFormState extends State<AddSongSpotifyForm> {
   TextEditingController searchController = TextEditingController();
   List<Spotify> spotifyResults = []; // List to hold Song objects
   final SongService songService = SongService(); // Instance of your SongService
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void searchSpotify(String query) async {
     if (query.isEmpty) {
@@ -701,55 +702,59 @@ class _AddSongSpotifyFormState extends State<AddSongSpotifyForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: TextField(
-            controller: searchController,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Search on Spotify...',
-              hintStyle: const TextStyle(color: Colors.white60),
-              fillColor: Colors.grey[800],
-              filled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30.0),
-                borderSide: BorderSide.none,
-              ),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.search, color: Colors.white),
-                onPressed: () {
-                  searchSpotify(searchController.text);
-                },
+    return Scaffold(
+      backgroundColor: const Color(0xFF171717),
+      key: _scaffoldKey, // Assign the key to your Scaffold
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: searchController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Search on Spotify...',
+                hintStyle: const TextStyle(color: Colors.white60),
+                fillColor: Colors.grey[800],
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    searchSpotify(searchController.text);
+                  },
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: spotifyResults.length,
-            itemBuilder: (context, index) {
-              final song = spotifyResults[index];
-              return ListTile(
-                leading: Image.network(song.albumImg, width: 50, height: 50,
-                    errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: Icon(Icons.music_note, color: Colors.white));
-                }),
-                title: Text(song.songName,
-                    style: const TextStyle(color: Colors.white)),
-                subtitle: Text(song.mainArtistName,
-                    style: const TextStyle(color: Colors.white70)),
-                tileColor: Colors.grey[850],
-                onTap: () => _showAddSongConfirmationDialog(song),
-              );
-            },
+          Expanded(
+            child: ListView.builder(
+              itemCount: spotifyResults.length,
+              itemBuilder: (context, index) {
+                final song = spotifyResults[index];
+                return ListTile(
+                  leading: Image.network(song.albumImg, width: 50, height: 50,
+                      errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Icon(Icons.music_note, color: Colors.white));
+                  }),
+                  title: Text(song.songName,
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: Text(song.mainArtistName,
+                      style: const TextStyle(color: Colors.white70)),
+                  tileColor: Colors.grey[850],
+                  onTap: () => _showAddSongConfirmationDialog(song),
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -757,7 +762,7 @@ class _AddSongSpotifyFormState extends State<AddSongSpotifyForm> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: Colors.grey[800], // Dark background for the dialog
           titleTextStyle: const TextStyle(
@@ -769,27 +774,21 @@ class _AddSongSpotifyFormState extends State<AddSongSpotifyForm> {
               'Do you want to add "${song.songName}" by ${song.mainArtistName} to the database?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel',
-                  style:
-                      TextStyle(color: Colors.red)), // Customized button text
+              child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
             ),
             TextButton(
-              child: const Text('Add',
-                  style:
-                      TextStyle(color: Colors.green)), // Customized button text
+              child: const Text('Add'),
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
                 bool success = await songService.saveSpotifySongToDb(song);
                 final snackBar = SnackBar(
                   content: Text(success
                       ? 'Song added successfully'
                       : 'Failed to add song'),
-                  backgroundColor: success
-                      ? Colors.green
-                      : Colors.red, // Change color based on success or failure
+                  backgroundColor: success ? Colors.green : Colors.red,
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
