@@ -66,12 +66,15 @@ class _MainPageContentState extends State<MainPageContent> {
                   color: Colors.grey[800],
                   borderRadius: BorderRadius.circular(30.0),
                 ),
-                child: const TextField(
+                child: TextField(
+                  style:
+                      TextStyle(color: Colors.white), // Text color when typing
                   decoration: InputDecoration(
                     hintText: 'Search...',
                     hintStyle: TextStyle(color: Colors.white),
                     border: InputBorder.none,
                     suffixIcon: Icon(Icons.search, color: Colors.white),
+                    labelStyle: TextStyle(color: Colors.white),
                   ),
                 ),
               ),

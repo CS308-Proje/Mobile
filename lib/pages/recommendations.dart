@@ -11,6 +11,8 @@ class RecommendationsPage extends StatefulWidget {
 }
 
 class _RecommendationsPageState extends State<RecommendationsPage> {
+  TextEditingController searchController = TextEditingController();
+
   Future<void> _refreshData() async {
     setState(() {
       // This will trigger the rebuild of the page with new data

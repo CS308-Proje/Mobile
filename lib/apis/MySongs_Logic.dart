@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:srs_mobile/models/spotifyModel.dart';
+
 import 'AuthLogic.dart'; // Secure storage
 import 'package:http/http.dart' as http;
 import '../models/songModel.dart'; // Import the Song model
@@ -314,6 +316,82 @@ class SongService {
     } catch (e) {
       print('Error exporting data: $e');
       throw Exception('Failed to export data');
+    }
+  }
+
+  Future<List<Spotify>> fetchSpotify(String songName) async {
+    String? tokenStorage = await storage.read(key: 'token');
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
+    };
+
+    final uri = Uri.parse(
+        'http://localhost:5001/directly-from-spotify?songName=$songName');
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      var data = json.decode(response.body) as Map<String, dynamic>;
+      var songsArray = data['songsArray'] as List;
+
+      return songsArray.map<Spotify>((json) => Spotify.fromJson(json)).toList();
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+      throw Exception('Failed to load songs from Spotify');
+    }
+  }
+
+  Future<bool> saveSpotifySongToDb(Spotify spotify) async {
+    String? tokenStorage = await storage.read(key: 'token');
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
+    };
+
+    final songData = {
+      'songName': spotify.songName,
+      'mainArtistName': spotify.mainArtistName,
+      'albumName': spotify.albumName,
+      'albumImg': spotify.albumImg,
+      'featuringArtistNames': spotify.featuring,
+      'popularity': spotify.popularity,
+      'duration_ms': spotify.duration,
+      'release_date': spotify.relaseDate,
+      'artistId': spotify.artistId,
+    };
+
+    final data = jsonEncode(songData);
+
+    // Check if the song is already in the database
+    List<Song> existingSongs = await fetchSongs();
+
+    bool songExists = existingSongs.any((existingSong) =>
+        existingSong.songName == spotify.songName &&
+        existingSong.mainArtistName == spotify.mainArtistName &&
+        existingSong.albumName == spotify.albumName);
+
+    if (songExists) {
+      print('Song already exists in the database. Skipping addition.');
+      return false;
+    } else {
+      final response = await http.post(
+        Uri.parse('http://localhost:5001/spotify-search-to-db'),
+        headers: headers,
+        body: data,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Song added successfully');
+        print('Response body: ${response.body}');
+        return true;
+      } else {
+        print('Failed to add the song. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return false;
+      }
     }
   }
 }
