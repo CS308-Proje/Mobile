@@ -731,8 +731,13 @@ class _AddSongSpotifyFormState extends State<AddSongSpotifyForm> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: spotifyResults.length,
+              separatorBuilder: (BuildContext context, int index) => Divider(
+                color: Colors.black, // Set the color of the divider
+                height: 0, // Set the height (thickness) of the divider
+                thickness: 3,
+              ),
               itemBuilder: (context, index) {
                 final song = spotifyResults[index];
                 return ListTile(
