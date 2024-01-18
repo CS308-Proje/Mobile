@@ -4,12 +4,7 @@ import 'package:flutter/material.dart';
 import '../pages/MainPage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // secure storage
 
-<<<<<<< HEAD
-const storage =
-    FlutterSecureStorage(); // Create an instance of secure storage
-=======
 const storage = FlutterSecureStorage(); // Create an instance of secure storage
->>>>>>> master
 
 Future<void> loginRequest(
     // ****** LOGIN REQUEST
@@ -72,12 +67,8 @@ Future<void> registerRequest(
   var url = Uri.parse(
       'http://10.0.2.2:5001/auth/register'); // Modify the endpoint if needed
   var data = {
-<<<<<<< HEAD
-    'name': username, // Using the provided username for both 'name' and 'username'
-=======
     'name':
         username, // Using the provided username for both 'name' and 'username'
->>>>>>> master
     'username': username,
     'email': email,
     'password': password,
@@ -147,8 +138,6 @@ Future<void> fetchAndStoreUserData() async {
     throw Exception('Failed to fetch user data');
   }
 }
-<<<<<<< HEAD
-=======
 
 Future<void> forgotPasswordRequest(BuildContext context, String email) async {
   var url = Uri.parse('http://10.0.2.2:5001/auth/forgotpassword');
@@ -190,4 +179,3 @@ Future<void> forgotPasswordRequest(BuildContext context, String email) async {
     );
   }
 }
->>>>>>> master

@@ -43,8 +43,4 @@ Future<void> rateItem(
   } catch (e) {
     print('Error occurred while sending rating: $e');
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> master

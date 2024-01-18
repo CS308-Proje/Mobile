@@ -15,8 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
 
-<<<<<<< HEAD
-=======
   void _showForgotPasswordDialog() {
     TextEditingController emailController = TextEditingController();
     TextEditingController verificationController = TextEditingController();
@@ -138,7 +136,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
->>>>>>> master
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -218,18 +215,12 @@ class _LoginPageState extends State<LoginPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-<<<<<<< HEAD
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[300]),
-=======
                     GestureDetector(
                       onTap: _showForgotPasswordDialog,
                       child: Text(
                         'Forgot Password?',
                         style: TextStyle(color: Colors.grey[300]),
                       ),
->>>>>>> master
                     ),
                   ],
                 ),
