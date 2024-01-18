@@ -25,4 +25,8 @@ class Song {
       ratingValue: json['ratingValue'],
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master

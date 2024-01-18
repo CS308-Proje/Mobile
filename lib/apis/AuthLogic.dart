@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import '../pages/MainPage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // secure storage
 
+<<<<<<< HEAD
 const storage =
     FlutterSecureStorage(); // Create an instance of secure storage
+=======
+const storage = FlutterSecureStorage(); // Create an instance of secure storage
+>>>>>>> master
 
 Future<void> loginRequest(
     // ****** LOGIN REQUEST
@@ -68,7 +72,12 @@ Future<void> registerRequest(
   var url = Uri.parse(
       'http://10.0.2.2:5001/auth/register'); // Modify the endpoint if needed
   var data = {
+<<<<<<< HEAD
     'name': username, // Using the provided username for both 'name' and 'username'
+=======
+    'name':
+        username, // Using the provided username for both 'name' and 'username'
+>>>>>>> master
     'username': username,
     'email': email,
     'password': password,
@@ -138,3 +147,47 @@ Future<void> fetchAndStoreUserData() async {
     throw Exception('Failed to fetch user data');
   }
 }
+<<<<<<< HEAD
+=======
+
+Future<void> forgotPasswordRequest(BuildContext context, String email) async {
+  var url = Uri.parse('http://10.0.2.2:5001/auth/forgotpassword');
+  var data = {'email': email};
+
+  try {
+    var response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(data),
+    );
+
+    if (response.statusCode == 200) {
+      var responseBody = json.decode(response.body);
+      if (responseBody['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseBody['data'])),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to send email: ${responseBody['data']}')),
+        );
+      }
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to reset password.')),
+      );
+    }
+  } catch (error) {
+    print('Error making the request: $error');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content:
+              Text('Error connecting to the server. Please try again later.')),
+    );
+  }
+}
+>>>>>>> master

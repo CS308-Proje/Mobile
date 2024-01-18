@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+<<<<<<< HEAD
 import 'AuthLogic.dart'; // Secure storage
 import 'package:http/http.dart' as http;
 import '../models/songModel.dart';    // Import the Song model
@@ -8,6 +9,17 @@ import '../models/albumModel.dart';   // Import the Album model
 
 class SongService {
   
+=======
+import 'package:srs_mobile/models/spotifyModel.dart';
+
+import 'AuthLogic.dart'; // Secure storage
+import 'package:http/http.dart' as http;
+import '../models/songModel.dart'; // Import the Song model
+import '../models/artistModel.dart'; // Import the Artist model
+import '../models/albumModel.dart'; // Import the Album model
+
+class SongService {
+>>>>>>> master
   Future<List<Song>> fetchSongs() async {
     String? tokenStorage = await storage.read(key: 'token');
 
@@ -80,12 +92,22 @@ class SongService {
     }
   }
 
+<<<<<<< HEAD
   Future<bool> addSongInfo(String songName, String mainArtist, List<String> featuringArtists, String albumName) async {
 
     String? tokenStorage = await storage.read(key: 'token'); // Await the Future
 
     final headers = {
       'Authorization': 'Bearer $tokenStorage', // Replace with your actual access token
+=======
+  Future<bool> addSongInfo(String songName, String mainArtist,
+      List<String> featuringArtists, String albumName) async {
+    String? tokenStorage = await storage.read(key: 'token'); // Await the Future
+
+    final headers = {
+      'Authorization':
+          'Bearer $tokenStorage', // Replace with your actual access token
+>>>>>>> master
       'Content-Type': 'application/json',
     };
 
@@ -98,18 +120,28 @@ class SongService {
 
     final data = jsonEncode(songData);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     // Check if the song is already in the database
     List<Song> existingSongs = await fetchSongs();
 
     bool songExists = existingSongs.any((song) =>
+<<<<<<< HEAD
       song.songName == songName &&
       song.mainArtistName == mainArtist &&
       song.albumName == albumName);
+=======
+        song.songName == songName &&
+        song.mainArtistName == mainArtist &&
+        song.albumName == albumName);
+>>>>>>> master
 
     if (songExists) {
       print('Song already exists in the database. Skipping addition.');
       return false;
+<<<<<<< HEAD
     } 
     
     else {
@@ -117,6 +149,13 @@ class SongService {
       Uri.parse('http://10.0.2.2:5001/songs'),
       headers: headers,
       body: data,
+=======
+    } else {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5001/songs'),
+        headers: headers,
+        body: data,
+>>>>>>> master
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -131,7 +170,12 @@ class SongService {
     }
   }
 
+<<<<<<< HEAD
   Future<List<int>> addSongFileWithProgress(File file, void Function(double)? onProgress) async {
+=======
+  Future<List<int>> addSongFileWithProgress(
+      File file, void Function(double)? onProgress) async {
+>>>>>>> master
     try {
       String content = await file.readAsString();
       List<dynamic> songs = jsonDecode(content);
@@ -145,10 +189,19 @@ class SongService {
           var songData = songs[i];
           String songName = songData['songName'];
           String mainArtist = songData['mainArtistName'];
+<<<<<<< HEAD
           List<String> featuringArtists = List<String>.from(songData['featuringArtistNames']);
           String albumName = songData['albumName'];
 
           bool isAdded = await addSongInfo(songName, mainArtist, featuringArtists, albumName);
+=======
+          List<String> featuringArtists =
+              List<String>.from(songData['featuringArtistNames']);
+          String albumName = songData['albumName'];
+
+          bool isAdded = await addSongInfo(
+              songName, mainArtist, featuringArtists, albumName);
+>>>>>>> master
 
           if (isAdded) {
             addedCount++;
@@ -159,7 +212,11 @@ class SongService {
           print('Error processing song data: $e');
           failedCount++;
         }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> master
         if (onProgress != null) {
           double progress = (i + 1) / songs.length;
           onProgress(progress);
@@ -173,7 +230,12 @@ class SongService {
     }
   }
 
+<<<<<<< HEAD
   Future<bool> transferSongs(String databaseURI, String databaseName, String collectionName) async {
+=======
+  Future<bool> transferSongs(
+      String databaseURI, String databaseName, String collectionName) async {
+>>>>>>> master
     try {
       String? tokenStorage = await storage.read(key: 'token');
 
@@ -242,7 +304,11 @@ class SongService {
       String? tokenStorage = await storage.read(key: 'token');
       final headers = {
         'Authorization': 'Bearer $tokenStorage',
+<<<<<<< HEAD
         'Content-Type': 'application/json',  //
+=======
+        'Content-Type': 'application/json', //
+>>>>>>> master
       };
 
       final response = await http.delete(
@@ -289,14 +355,22 @@ class SongService {
   Future<List<dynamic>> fetchExportData(String artist, String rating) async {
     try {
       String? tokenStorage = await storage.read(key: 'token');
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> master
       final headers = {
         'Authorization': 'Bearer $tokenStorage',
         'Content-Type': 'application/json',
       };
 
       Uri uri = Uri.parse('http://10.0.2.2:5001/export')
+<<<<<<< HEAD
         .replace(queryParameters: {'artist': artist, 'rating': rating});
+=======
+          .replace(queryParameters: {'artist': artist, 'rating': rating});
+>>>>>>> master
 
       final response = await http.post(
         uri,
@@ -315,4 +389,84 @@ class SongService {
       throw Exception('Failed to export data');
     }
   }
+<<<<<<< HEAD
 }
+=======
+
+  Future<List<Spotify>> fetchSpotify(String songName) async {
+    String? tokenStorage = await storage.read(key: 'token');
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
+    };
+
+    final uri = Uri.parse(
+        'http://10.0.2.2:5001/directly-from-spotify?songName=$songName');
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      var data = json.decode(response.body) as Map<String, dynamic>;
+      var songsArray = data['songsArray'] as List;
+
+      return songsArray.map<Spotify>((json) => Spotify.fromJson(json)).toList();
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+      throw Exception('Failed to load songs from Spotify');
+    }
+  }
+
+  Future<bool> saveSpotifySongToDb(Spotify spotify) async {
+    String? tokenStorage = await storage.read(key: 'token');
+
+    final headers = {
+      'Authorization': 'Bearer $tokenStorage',
+      'Content-Type': 'application/json',
+    };
+
+    final songData = {
+      'songName': spotify.songName,
+      'mainArtistName': spotify.mainArtistName,
+      'albumName': spotify.albumName,
+      'albumImg': spotify.albumImg,
+      'featuringArtistNames': spotify.featuring,
+      'popularity': spotify.popularity,
+      'duration_ms': spotify.duration,
+      'release_date': spotify.relaseDate,
+      'artistId': spotify.artistId,
+    };
+
+    final data = jsonEncode(songData);
+
+    // Check if the song is already in the database
+    List<Song> existingSongs = await fetchSongs();
+
+    bool songExists = existingSongs.any((existingSong) =>
+        existingSong.songName == spotify.songName &&
+        existingSong.mainArtistName == spotify.mainArtistName &&
+        existingSong.albumName == spotify.albumName);
+
+    if (songExists) {
+      print('Song already exists in the database. Skipping addition.');
+      return false;
+    } else {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5001/spotify-search-to-db'),
+        headers: headers,
+        body: data,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Song added successfully');
+        print('Response body: ${response.body}');
+        return true;
+      } else {
+        print('Failed to add the song. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return false;
+      }
+    }
+  }
+}
+>>>>>>> master

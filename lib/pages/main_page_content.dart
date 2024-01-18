@@ -67,6 +67,11 @@ class _MainPageContentState extends State<MainPageContent> {
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 child: const TextField(
+<<<<<<< HEAD
+=======
+                  style:
+                      TextStyle(color: Colors.white), // Text color when typing
+>>>>>>> master
                   decoration: InputDecoration(
                     hintText: 'Search...',
                     hintStyle: TextStyle(color: Colors.white),
@@ -277,4 +282,8 @@ class __MusicCardState extends State<_MusicCard> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master
