@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../apis/AuthLogic.dart';
 import '../models/artistModel.dart';
 
+//////////////////////////
 class StatisticsLogic {
 
   Future<Uint8List> songAnalysis(String type, DateTime? start, DateTime? end) async {
